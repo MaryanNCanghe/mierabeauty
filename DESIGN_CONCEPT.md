@@ -1,6 +1,6 @@
 # Mimmi's Beauty — Design Concept
 
-> *"Crafted for the radiant. Rooted in Africa."*
+> *"Crafted for the radiant. Made for every girl."*
 
 ---
 
@@ -9,7 +9,7 @@
 | | |
 |---|---|
 | **Brand name** | MIMMI'S BEAUTY |
-| **Tagline** | Crafted for the radiant. Rooted in Africa. |
+| **Tagline** | Crafted for the radiant. Made for every girl. |
 | **Contact** | hello@mimmisbeauty.com |
 | **Language** | English |
 | **Currency** | € EUR |
@@ -46,7 +46,7 @@
 Used for: hero titles, section headings, product names.
 
 ```
-The Art of African Beauty.      ← 72px / weight 300
+The Art of Radiant Beauty.      ← 72px / weight 300
 Radiance, Refined.              ← 56px / weight 300
 New Arrivals                    ← 40px / weight 300
 ```
@@ -99,15 +99,15 @@ Product description text.  ← 14px / weight 400 / line-height 1.6
 
   ┌───────────────────────────────────────────────────────────┐
   │                                                           │
-  │         [FULL-BLEED IMAGE — African beauty 100vh]         │
+  │         [FULL-BLEED IMAGE — radiant beauty 100vh]         │
   │                                                           │
   │  New Collection                           ← gold label    │
   │                                                           │
   │  The Art of                               ← Cormorant     │
-  │  African Beauty.                            72px light     │
+  │  Radiant Beauty.                            72px light     │
   │                                                           │
-  │  Luxury skincare rooted in the            ← DM Sans       │
-  │  richness of African nature.                16px, white/70 │
+  │  Luxury skincare made for every           ← DM Sans       │
+  │  girl, rooted in nature.                    16px, white/70 │
   │                                                           │
   │  [ EXPLORE THE COLLECTION ]               ← ghost button  │
   │                                             gold border    │

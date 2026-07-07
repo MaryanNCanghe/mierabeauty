@@ -90,20 +90,20 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
         </div>
 
         {/* Product info */}
-        <div className="px-5 py-5 bg-white">
-          <h3 className="font-display text-xl font-light leading-snug text-[var(--m-black)]">
+        <div className="px-3 py-3 sm:px-5 sm:py-5 bg-white">
+          <h3 className="font-display text-base sm:text-xl font-light leading-snug text-[var(--m-black)]">
             {name}
           </h3>
 
           {description && (
-            <p className="mt-1.5 text-[var(--m-muted)] text-xs font-light leading-relaxed line-clamp-2">
+            <p className="mt-1 sm:mt-1.5 text-[var(--m-muted)] text-xs font-light leading-relaxed line-clamp-1 sm:line-clamp-2">
               {description}
             </p>
           )}
 
-          <div className="mt-4 flex items-center justify-between">
-            <span className="m-label text-[var(--m-muted)]">From {price}</span>
-            <span className="m-label text-[var(--m-gold)] group-hover:underline underline-offset-4 transition-all duration-200 tracking-widest">
+          <div className="mt-2 sm:mt-4 flex items-center justify-between">
+            <span className="m-label text-[var(--m-muted)] text-[0.6rem] sm:text-xs">From {price}</span>
+            <span className="m-label text-[var(--m-gold)] group-hover:underline underline-offset-4 transition-all duration-200 tracking-widest text-[0.6rem] sm:text-xs">
               SHOP →
             </span>
           </div>

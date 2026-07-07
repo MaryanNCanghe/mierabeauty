@@ -61,10 +61,10 @@ export default function AboutPage() {
           <div className="flex flex-col items-center gap-6 max-w-3xl animate-fadeInUp">
             <span className="m-label text-[var(--m-gold)]">Our Story</span>
             <h1 className="about-hero-title">
-              Beauty Born from the Heart of Africa.
+              Beauty, Crafted for Every Girl.
             </h1>
             <p className="text-white/70 text-base md:text-lg font-light leading-relaxed max-w-xl">
-              Miera Beauty was born from a deep love for African heritage — its rituals, its botanicals, and its timeless approach to radiance.
+              Miera Beauty was born from a deep love for beauty rituals, fine botanicals, and a timeless approach to radiance.
             </p>
           </div>
         </div>
@@ -74,8 +74,8 @@ export default function AboutPage() {
       <section className="w-full px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-64 py-24 bg-[var(--m-white)]">
         <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-12">
           {[
-            { title: "Heritage", body: "Every formula draws inspiration from ancestral African beauty rituals passed down through generations." },
-            { title: "Purity", body: "We source only the finest natural ingredients — shea, marula, baobab — directly from the continent." },
+            { title: "Heritage", body: "Every formula draws inspiration from timeless beauty rituals passed down through generations." },
+            { title: "Purity", body: "We source only the finest natural ingredients — shea, marula, baobab — chosen for purity and quality." },
             { title: "Luxury", body: "Crafted for those who believe that beauty is a ritual, not a routine. Every detail is intentional." },
           ].map((v) => (
             <div key={v.title} className="flex flex-col gap-4">

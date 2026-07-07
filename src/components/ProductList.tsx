@@ -46,8 +46,15 @@ export default async function ProductListSupabase({
     if (catErr) throw new Error(`Failed to load category: ${catErr.message}`);
 
     if (cat?.id) {
+      // Selecting a parent category also matches products tagged with any of its subcategories
+      const { data: family, error: familyErr } = await supabase
+        .from('categories').select('id').or(`id.eq.${cat.id},parent_id.eq.${cat.id}`);
+      if (familyErr) throw new Error(`Failed to load category family: ${familyErr.message}`);
+
+      const categoryIds = (family ?? []).map((c) => c.id);
+
       const { data: links, error: linkErr } = await supabase
-        .from('product_categories').select('product_id').eq('category_id', cat.id);
+        .from('product_categories').select('product_id').in('category_id', categoryIds);
       if (linkErr) throw new Error(`Failed to load category links: ${linkErr.message}`);
 
       const ids = (links ?? []).map((l) => l.product_id);
@@ -105,7 +112,7 @@ export default async function ProductListSupabase({
 
   return (
     <>
-      <div className={`grid ${colClass} gap-5 md:gap-7`}>
+      <div className={`grid ${colClass} gap-3 sm:gap-5 md:gap-7`}>
         {cards.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

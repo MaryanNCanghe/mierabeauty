@@ -1,17 +1,21 @@
 
 // src/components/CategoryList.tsx
+import Image from "next/image";
 import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 import MobileScrollHintRight from "./MobileScrollHintRight";
+import { topLevelCategories } from "@/lib/categories";
 
 const CategoryList = async () => {
   const supabase = supabaseServer();
-  const { data: cats, error } = await supabase
+  const { data: allCats, error } = await supabase
     .from("categories")
-    .select("id, slug, name")
+    .select("id, slug, name, parent_id, image_url")
     .order("name", { ascending: true });
 
   if (error) throw new Error(`Failed to load categories: ${error.message}`);
+
+  const cats = topLevelCategories(allCats ?? []);
 
   if (!cats?.length) return null;
 
@@ -26,13 +30,21 @@ const CategoryList = async () => {
           {(cats ?? []).map((item) => (
             <Link
               href={`/list?cat=${item.slug}`}
-              className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 xl:w-1/6 snap-start"
+              className="flex-shrink-0 w-1/2 sm:w-1/3 lg:w-1/4 snap-start"
               key={item.id}
             >
-              <div className="relative bg-slate-100 w-full h-[750px] sm:h-[900px] md:h-[500px] lg:h-[500px]">
-                <img src="/placeholder.png" alt="" />
+              <div className="relative bg-[var(--m-blush)] w-full h-56 sm:h-64 md:h-72 overflow-hidden rounded-lg">
+                {item.image_url && (
+                  <Image
+                    src={item.image_url}
+                    alt={item.name ?? ""}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover"
+                  />
+                )}
               </div>
-              <h1 className="mt-8 z-label-1 tracking-wide border border-black px-4 py-2 inline-block">
+              <h1 className="mt-4 z-label-1 tracking-wide border-b border-[var(--m-black)] pb-2 block w-full">
                 {item.name}
               </h1>
             </Link>

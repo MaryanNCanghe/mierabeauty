@@ -8,7 +8,7 @@ const ListPage = async ({ searchParams }: { searchParams?: any }) => {
   const supabase = supabaseServer();
   const { data: categories } = await supabase
     .from("categories")
-    .select("id, slug, name")
+    .select("id, slug, name, parent_id")
     .order("name", { ascending: true });
 
   return (

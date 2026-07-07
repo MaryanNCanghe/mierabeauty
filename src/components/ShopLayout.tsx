@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Suspense } from "react";
 import Filter from "./Filter";
-
-type Category = { id: number; slug: string; name: string | null };
+import type { Category } from "@/lib/categories";
 
 export default function ShopLayout({
   categories,
@@ -20,7 +19,7 @@ export default function ShopLayout({
       {/* ── Page header ── */}
       <div className="mb-10 border-b border-[var(--m-black)]/10 pb-6 flex items-end justify-between">
         <div>
-          <span className="m-label text-[var(--m-gold)]">Collection</span>
+          <span className="m-label text-[var(--m-gold)]">Products</span>
           <h1 className="font-display text-4xl md:text-5xl font-light mt-2 text-[var(--m-black)]">
             All Products
           </h1>

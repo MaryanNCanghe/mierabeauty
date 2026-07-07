@@ -2,8 +2,8 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-
-type Category = { id: number; slug: string; name: string | null };
+import type { Category } from "@/lib/categories";
+import { buildCategoryTree } from "@/lib/categories";
 
 type Props = {
   categories: Category[];
@@ -74,6 +74,17 @@ export default function Filter({ categories, isOpen, onClose }: Props) {
   const [min,  setMin]  = useState(searchParams.get("min")  ?? "");
   const [max,  setMax]  = useState(searchParams.get("max")  ?? "");
 
+  const categoryTree = buildCategoryTree(categories);
+  const [expanded, setExpanded] = useState<Record<number, boolean>>(() =>
+    Object.fromEntries(
+      categoryTree
+        .filter((parent) => parent.children.some((child) => child.slug === cat))
+        .map((parent) => [parent.id, true])
+    )
+  );
+  const toggleExpanded = (id: number) =>
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+
   const activeCount = [cat, sort, min, max].filter(Boolean).length;
 
   function push(overrides: Record<string, string>) {
@@ -136,7 +147,7 @@ export default function Filter({ categories, isOpen, onClose }: Props) {
       </Section>
 
       {/* Categories */}
-      {categories.length > 0 && (
+      {categoryTree.length > 0 && (
         <Section title="CATEGORY">
           <div className="flex flex-col gap-3">
             <button
@@ -149,20 +160,53 @@ export default function Filter({ categories, isOpen, onClose }: Props) {
               <FilterDot active={!cat} />
               All
             </button>
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => { setCat(c.slug); push({ cat: c.slug }); }}
-                className={`flex items-center text-left m-label transition-colors ${
-                  cat === c.slug
-                    ? "text-[var(--m-black)] font-medium"
-                    : "text-[var(--m-muted)] hover:text-[var(--m-black)]"
-                }`}
-              >
-                <FilterDot active={cat === c.slug} />
-                {c.name ?? c.slug}
-              </button>
+            {categoryTree.map((parent, i) => (
+              <div key={parent.id}>
+                {i > 0 && <hr className="border-t border-[var(--m-black)]/8 mb-3" />}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => { setCat(parent.slug); push({ cat: parent.slug }); }}
+                    className={`flex-1 flex items-center text-left m-label transition-colors ${
+                      cat === parent.slug
+                        ? "text-[var(--m-black)] font-medium"
+                        : "text-[var(--m-muted)] hover:text-[var(--m-black)]"
+                    }`}
+                  >
+                    <FilterDot active={cat === parent.slug} />
+                    {parent.name ?? parent.slug}
+                  </button>
+                  {parent.children.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => toggleExpanded(parent.id)}
+                      aria-label={expanded[parent.id] ? `Collapse ${parent.name}` : `Expand ${parent.name}`}
+                      className="p-1 text-[var(--m-subtle)] hover:text-[var(--m-black)]"
+                    >
+                      <ChevronIcon open={!!expanded[parent.id]} />
+                    </button>
+                  )}
+                </div>
+                {parent.children.length > 0 && expanded[parent.id] && (
+                  <div className="flex flex-col gap-2.5 mt-2.5 ml-4">
+                    {parent.children.map((child) => (
+                      <button
+                        key={child.id}
+                        type="button"
+                        onClick={() => { setCat(child.slug); push({ cat: child.slug }); }}
+                        className={`flex items-center text-left m-label transition-colors ${
+                          cat === child.slug
+                            ? "text-[var(--m-black)] font-medium"
+                            : "text-[var(--m-muted)] hover:text-[var(--m-black)]"
+                        }`}
+                      >
+                        <FilterDot active={cat === child.slug} />
+                        {child.name ?? child.slug}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </Section>

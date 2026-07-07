@@ -24,14 +24,14 @@ const params = new URLSearchParams(searchParams?.toString() ?? "");
   return (
     <div className="mt-12 flex justify-between w-full">
       <button
-        className="z-btn--primary p-3 z-label w-24 cursor-pointer disabled:cursor-not-allowed disabled:bg-grey-200"
+        className="z-btn--primary p-3 w-24 cursor-pointer disabled:cursor-not-allowed disabled:bg-grey-200"
         disabled={!hasPrev}
         onClick={() => createPageUrl(currentPage - 1)}
       >
         Previous
       </button>
       <button
-        className="z-btn--primary p-3 z-label w-24 cursor-pointer disabled:cursor-not-allowed disabled:bg-grey-200"
+        className="z-btn--primary p-3 w-24 cursor-pointer disabled:cursor-not-allowed disabled:bg-grey-200"
         disabled={!hasNext}
         onClick={() => createPageUrl(currentPage + 1)}
       >

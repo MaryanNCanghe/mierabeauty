@@ -6,8 +6,9 @@ import Menu from "./Menu";
 import NavIcons from "./NavIcons";
 import MobileInlineSearch from "./MobileInlineSearch";
 import SearchBar from "./SearchBar";
+import type { Category } from "@/lib/categories";
 
-const Navbar = () => {
+const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -43,7 +44,7 @@ const Navbar = () => {
           </div>
           <div className="flex items-center justify-end gap-2">
             <NavIcons />
-            <Menu />
+            <Menu categories={categories} />
           </div>
         </div>
 
@@ -61,7 +62,7 @@ const Navbar = () => {
                 { href: "/",       label: "Homepage" },
                 { href: "/list",   label: "Shop"     },
                 { href: "/about",  label: "About"    },
-                { href: "/gallery",label: "Gallery"  },
+                { href: "/gallery",label: "Tutorials"},
               ].map(({ href, label }) => (
                 <Link
                   key={href}
@@ -94,7 +95,7 @@ const Navbar = () => {
               )}
             </button>
             <NavIcons />
-            <Menu />
+            <Menu categories={categories} />
           </div>
         </div>
       </div>

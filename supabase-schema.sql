@@ -22,8 +22,13 @@ create table if not exists categories (
   slug       text        not null unique,
   name       text        not null,
   image_url  text,
+  parent_id  bigint      references categories(id) on delete cascade,
   created_at timestamptz not null default now()
 );
+
+-- Idempotent: adds the column if this file is re-run against a DB
+-- created before subcategories existed.
+alter table categories add column if not exists parent_id bigint references categories(id) on delete cascade;
 
 -- ── Products ────────────────────────────────
 create table if not exists products (
@@ -323,6 +328,9 @@ create index if not exists idx_variants_pid         on product_variants(product_
 create index if not exists idx_pc_product           on product_categories(product_id);
 create index if not exists idx_pc_category          on product_categories(category_id);
 
+-- categories (subcategory lookups)
+create index if not exists idx_categories_parent    on categories(parent_id);
+
 -- orders
 create index if not exists idx_orders_user_id       on orders(user_id);
 create index if not exists idx_orders_intent        on orders(stripe_payment_intent_id);
@@ -337,6 +345,77 @@ create index if not exists idx_order_items_order    on order_items(order_id);
 
 -- profiles
 create index if not exists idx_profiles_user        on profiles(user_id);
+
+
+-- =============================================
+-- SEED DATA — Category taxonomy
+-- =============================================
+-- Idempotent: safe to re-run, uses ON CONFLICT (slug) DO NOTHING.
+
+-- Top-level categories
+insert into categories (slug, name) values
+  ('beauty',         'Beauty'),
+  ('hair',           'Hair'),
+  ('makeup',         'Makeup'),
+  ('skincare',       'Skincare'),
+  ('accessories',    'Accessories'),
+  ('mens-hair-care', 'Men''s Hair Care')
+on conflict (slug) do nothing;
+
+-- Subcategories — each row resolves its parent by slug
+insert into categories (slug, name, parent_id)
+select v.slug, v.name, p.id
+from (values
+  ('body-care',           'Body Care',              'beauty'),
+  ('bath-shower',         'Bath & Shower',           'beauty'),
+  ('fragrance',           'Fragrance',               'beauty'),
+  ('nail-care',           'Nail Care',               'beauty'),
+
+  ('lace-front-wigs',     'Lace Front Wigs',         'hair'),
+  ('full-lace-wigs',      'Full Lace Wigs',          'hair'),
+  ('bundles-weaves',      'Bundles & Weaves',        'hair'),
+  ('closures-frontals',   'Closures & Frontals',     'hair'),
+  ('virgin-human-hair',   'Virgin Human Hair',       'hair'),
+  ('synthetic-hair',      'Synthetic Hair',          'hair'),
+  ('clip-ins',            'Clip-Ins',                'hair'),
+  ('ponytails',           'Ponytails',               'hair'),
+  ('braiding-hair',       'Braiding Hair',           'hair'),
+
+  ('foundation',          'Foundation',              'makeup'),
+  ('concealer',           'Concealer',               'makeup'),
+  ('powder',              'Powder',                  'makeup'),
+  ('blush-bronzer',       'Blush & Bronzer',         'makeup'),
+  ('eyeshadow',           'Eyeshadow',               'makeup'),
+  ('eyeliner-mascara',    'Eyeliner & Mascara',      'makeup'),
+  ('lashes-brows',        'Lashes & Brows',          'makeup'),
+  ('lipstick-gloss',      'Lipstick & Lip Gloss',    'makeup'),
+  ('makeup-brushes-tools','Makeup Brushes & Tools',  'makeup'),
+
+  ('cleansers',           'Cleansers',               'skincare'),
+  ('toners',              'Toners',                  'skincare'),
+  ('serums-treatments',   'Serums & Treatments',     'skincare'),
+  ('moisturizers',        'Moisturizers',            'skincare'),
+  ('sunscreen',           'Sunscreen (SPF)',         'skincare'),
+  ('face-masks',          'Face Masks',              'skincare'),
+  ('exfoliants',          'Exfoliants',              'skincare'),
+  ('eye-care',            'Eye Care',                'skincare'),
+
+  ('edge-control-gel',    'Edge Control & Gel',      'accessories'),
+  ('hair-glue-adhesive',  'Hair Glue & Adhesive',    'accessories'),
+  ('wig-caps-liners',     'Wig Caps & Liners',       'accessories'),
+  ('wavy-combs-brushes',  'Wavy Combs & Brushes',    'accessories'),
+  ('edge-brushes',        'Edge Brushes',            'accessories'),
+  ('hair-clips-pins',     'Hair Clips & Pins',       'accessories'),
+  ('rollers-curlers',     'Rollers & Curlers',       'accessories'),
+
+  ('beard-care',          'Beard Care',              'mens-hair-care'),
+  ('pomade-styling',      'Pomade & Styling',        'mens-hair-care'),
+  ('clippers-trimmers',   'Clippers & Trimmers',     'mens-hair-care'),
+  ('grooming-kits',       'Grooming Kits',           'mens-hair-care'),
+  ('cologne-aftershave',  'Cologne & Aftershave',    'mens-hair-care')
+) as v(slug, name, parent_slug)
+join categories p on p.slug = v.parent_slug
+on conflict (slug) do nothing;
 
 
 -- =============================================
@@ -375,3 +454,5 @@ create policy "public_read_product_images_storage"
 --           immutable user_id guard
 -- Indexes : covering all filter/sort/join columns + GIN trigram on name
 -- Storage : product-images bucket (public read, service_role write)
+-- Seed    : category taxonomy — Beauty, Hair, Makeup, Skincare,
+--           Accessories, Men's Hair Care + subcategories (categories.parent_id)

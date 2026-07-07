@@ -81,13 +81,8 @@ export default function Add(props: {
             </button>
           </div>
 
-          {isOutOfStock ? (
+          {isOutOfStock && (
             <div className="text-xs">Product is out of stock</div>
-          ) : (
-            <div className="text-xs">
-              Only <span className="text-orange-500">{stock} items</span> left!
-              <br /> {"Don't"} miss it
-            </div>
           )}
         </div>
 
