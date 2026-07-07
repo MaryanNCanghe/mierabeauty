@@ -1,0 +1,15 @@
+{
+  "buyerEmail": "buyer@example.com",
+  "shipping": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "address1": "Rua Teste 123",
+    "city": "Lisboa",
+    "postalCode": "1000-100",
+    "country": "PT"
+  },
+  "items": [
+    { "productId": 1, "name": "Produto Teste", "priceCents": 1500, "qty": 1 }
+  ],
+  "currency": "eur"
+}

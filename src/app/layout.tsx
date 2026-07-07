@@ -1,22 +1,40 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from "next";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { CartProvider } from "@/contexts/cart";
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-display",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
-  title: "Lama Dev E-Commerce Application",
-  description: "A complete e-commerce application with Next.js and Wix",
+  title: "MIERA",
+  description: "Luxury African beauty, rooted in tradition.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${cormorant.variable} ${dmSans.variable} min-h-screen flex flex-col`}>
+        <CartProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </CartProvider>
+      </body>
     </html>
   );
 }

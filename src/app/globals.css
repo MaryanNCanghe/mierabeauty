@@ -1,3 +1,428 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* ========================= */
+/* Miera Beauty — Design System */
+/* ========================= */
+
+:root {
+  /* Brand Palette */
+  --m-black:   #0A0A0A;
+  --m-white:   #FAFAF8;
+  --m-gold:    #C9A96E;
+  --m-earth:   #7A4F35;
+  --m-blush:   #EDD9C8;
+  --m-muted:   #6B6B6B;
+  --m-subtle:  #A8A39D;
+
+  /* Typography */
+  --font-family-display: var(--font-display), 'Cormorant Garamond', Georgia, serif;
+  --font-family-body:    var(--font-body), 'DM Sans', 'Helvetica', Arial, sans-serif;
+  --font-family-main:    var(--font-body), 'DM Sans', 'Helvetica', Arial, sans-serif;
+
+  /* Font Sizes */
+  --fs-xs:  0.625rem;    /* 10px */
+  --fs-sm:  0.6875rem;   /* 11px */
+  --fs-md:  0.8125rem;   /* 13px */
+  --fs-lg:  1rem;        /* 16px */
+  --fs-xl:  1.25rem;     /* 20px */
+  --fs-2xl: 1.5rem;      /* 24px */
+  --fs-3xl: 2rem;        /* 32px */
+  --fs-4xl: 2.5rem;      /* 40px */
+  --fs-5xl: 3.5rem;      /* 56px */
+
+  /* Line Heights */
+  --lh-xs:  1rem;
+  --lh-sm:  1rem;
+  --lh-md:  1.25rem;
+  --lh-lg:  1.5rem;
+  --lh-xl:  1.75rem;
+  --lh-2xl: 2rem;
+  --lh-3xl: 2.5rem;
+  --lh-4xl: 3rem;
+
+  /* Letter Spacing */
+  --ls-tight:  -0.01em;
+  --ls-none:   0;
+  --ls-wide:   0.08em;
+  --ls-wider:  0.12em;
+
+  /* Font Weights */
+  --fw-light:   300;
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semibold:600;
+
+  /* Spacing / Sizing */
+  --m-border-hairline: 0.5px;
+  --m-padding-x: 0.75rem;
+  --m-padding-y: 0.5rem;
+  --m-min-height: 2.25rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:  cubic-bezier(0.4, 0, 1, 1);
+  --duration-fast:   150ms;
+  --duration-base:   300ms;
+  --duration-slow:   600ms;
+}
+
+
+/* ========================= */
+/* Base reset                */
+/* ========================= */
+
+html, body {
+  font-family: var(--font-family-body);
+  background-color: var(--m-white);
+  color: var(--m-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+a[role="button"],
+.input-button {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  appearance: none;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-family-body);
+  }
+}
+
+
+/* ========================= */
+/* Scrollbar utilities       */
+/* ========================= */
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+/* ========================= */
+/* Animations                */
+/* ========================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp var(--duration-slow) var(--ease-out) both;
+}
+
+.animate-fadeIn {
+  animation: fadeIn var(--duration-base) var(--ease-out) both;
+}
+
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+
+
+/* ========================= */
+/* Button System             */
+/* ========================= */
+
+.m-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: var(--m-min-height);
+  padding: var(--m-padding-y) var(--m-padding-x);
+  width: fit-content;
+  gap: 0.25rem;
+
+  border-radius: 0;
+  border: var(--m-border-hairline) solid transparent;
+  background-color: transparent;
+  color: var(--m-black);
+
+  font-family: var(--font-family-body);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wider);
+  font-weight: var(--fw-light);
+
+  cursor: pointer;
+  transition:
+    color var(--duration-base) var(--ease-out),
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.m-btn--primary {
+  background-color: var(--m-black);
+  color: var(--m-white);
+  border-color: var(--m-black);
+}
+.m-btn--primary:hover {
+  background-color: var(--m-earth);
+  border-color: var(--m-earth);
+  transform: scale(1.01);
+}
+.m-btn--primary:active {
+  transform: scale(0.99);
+}
+
+.m-btn--secondary {
+  background-color: transparent;
+  color: var(--m-black);
+  border-color: var(--m-gold);
+}
+.m-btn--secondary:hover {
+  background-color: var(--m-gold);
+  color: var(--m-white);
+  transform: scale(1.01);
+}
+
+.m-btn--ghost {
+  background-color: transparent;
+  color: var(--m-white);
+  border: 1px solid rgba(255,255,255,0.7);
+  padding: 0.875rem 2.5rem;
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-wider);
+}
+.m-btn--ghost:hover {
+  background-color: rgba(255,255,255,0.1);
+  border-color: var(--m-gold);
+  color: var(--m-gold);
+  transform: scale(1.01);
+}
+
+.m-btn--sm {
+  --m-padding-x: 0.5rem;
+  --m-padding-y: 0.25rem;
+  --m-min-height: 1.75rem;
+  font-size: 0.625rem;
+}
+
+.m-btn--lg {
+  --m-padding-x: 2rem;
+  --m-padding-y: 0.875rem;
+  --m-min-height: 3rem;
+  font-size: var(--fs-md);
+}
+
+
+/* ========================= */
+/* Typography utilities      */
+/* ========================= */
+
+.font-display { font-family: var(--font-family-display); }
+.font-body    { font-family: var(--font-family-body); }
+.font-main    { font-family: var(--font-family-body); }
+
+.fs-xs  { font-size: var(--fs-xs);  line-height: var(--lh-xs);  }
+.fs-sm  { font-size: var(--fs-sm);  line-height: var(--lh-sm);  }
+.fs-md  { font-size: var(--fs-md);  line-height: var(--lh-md);  }
+.fs-lg  { font-size: var(--fs-lg);  line-height: var(--lh-lg);  }
+.fs-xl  { font-size: var(--fs-xl);  line-height: var(--lh-xl);  }
+.fs-2xl { font-size: var(--fs-2xl); line-height: var(--lh-2xl); }
+.fs-3xl { font-size: var(--fs-3xl); line-height: var(--lh-3xl); }
+.fs-4xl { font-size: var(--fs-4xl); line-height: var(--lh-4xl); }
+
+.fw-light    { font-weight: var(--fw-light);   }
+.fw-regular  { font-weight: var(--fw-regular); }
+.fw-medium   { font-weight: var(--fw-medium);  }
+.fw-semibold { font-weight: var(--fw-semibold);}
+
+.ls-tight  { letter-spacing: var(--ls-tight);  }
+.ls-none   { letter-spacing: var(--ls-none);   }
+.ls-wide   { letter-spacing: var(--ls-wide);   }
+.ls-wider  { letter-spacing: var(--ls-wider);  }
+
+.uppercase  { text-transform: uppercase; }
+.capitalize { text-transform: capitalize; }
+
+
+/* ========================= */
+/* Section / UI composites   */
+/* ========================= */
+
+/* Small label — nav, badges */
+.m-label {
+  font-family: var(--font-family-body);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-sm);
+  font-weight: var(--fw-light);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wider);
+  color: var(--m-muted);
+}
+
+/* Serif display section title */
+.m-section-title {
+  font-family: var(--font-family-display);
+  font-size: var(--fs-3xl);
+  line-height: 1.1;
+  font-weight: var(--fw-light);
+  letter-spacing: var(--ls-tight);
+  color: var(--m-black);
+}
+
+/* Gold underline title variant */
+.m-section-title--underline {
+  display: inline-block;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--m-gold);
+}
+
+/* Uppercase serif title (for categories, nav labels) */
+.m-title-sm {
+  font-family: var(--font-family-body);
+  font-size: var(--fs-md);
+  line-height: var(--lh-md);
+  font-weight: var(--fw-light);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wider);
+}
+
+.m-title-md {
+  font-family: var(--font-family-body);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-lg);
+  font-weight: var(--fw-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-wide);
+}
+
+/* ========================= */
+/* Slider                    */
+/* ========================= */
+
+.slider-track {
+  transform: translateX(var(--slider-offset, 0));
+  transition: transform 900ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider-hero-title {
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  line-height: 1.05;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  white-space: pre-line;
+  color: white;
+}
+
+.slider-hero-subtitle {
+  font-family: var(--font-family-body);
+  font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.7);
+}
+
+
+/* About page hero title */
+.about-hero-title {
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: white;
+}
+
+
+/* Gold hairline divider */
+.m-divider {
+  height: var(--m-border-hairline);
+  background-color: var(--m-gold);
+  border: none;
+  width: 100%;
+}
+
+
+/* ========================= */
+/* Navbar glass effect       */
+/* ========================= */
+
+.navbar-glass {
+  background: rgba(250, 250, 248, 0.85) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: var(--m-border-hairline) solid rgba(201, 169, 110, 0.3);
+}
+
+
+/* ========================= */
+/* Product card              */
+/* ========================= */
+
+/* Legacy flex-card helper (kept for any non-grid usage) */
+.m-product-card {
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+.m-product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(10, 10, 10, 0.08);
+}
+
+/* Apple-style card: shadow lifts on group-hover (handled by Tailwind in ProductCard) */
+/* Active image dot — pill shape */
+.img-dot-active {
+  width: 1rem;
+  height: 0.375rem;
+  border-radius: 9999px;
+  background-color: var(--m-gold);
+}
+.img-dot-inactive {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 9999px;
+  background-color: rgba(255,255,255,0.6);
+}
+
+
+/* ========================= */
+/* Backward-compat aliases   */
+/* (keep z-* classes alive   */
+/*  for components not yet   */
+/*  migrated)                */
+/* ========================= */
+
+.z-btn          { @apply m-btn; }
+.z-btn--primary { @apply m-btn--primary; }
+.z-btn--secondary { @apply m-btn--secondary; }
+.z-btn--ghost   { @apply m-btn--ghost; }
+.z-btn--sm      { @apply m-btn--sm; }
+.z-btn--lg      { @apply m-btn--lg; }
+
+.z-label   { @apply m-label; }
+.z-label-1 { font-family: var(--font-family-body); font-size: var(--fs-md); line-height: var(--lh-sm); font-weight: var(--fw-light); text-transform: uppercase; letter-spacing: var(--ls-wider); }
+.z-title-sm { @apply m-title-sm; }
+.z-title-md { @apply m-title-md; }
