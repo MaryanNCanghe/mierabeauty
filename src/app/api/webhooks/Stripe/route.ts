@@ -72,16 +72,16 @@ export async function POST(req: NextRequest) {
               if (upsertErr) console.error("profiles upsert error:", upsertErr);
             }
 
-            // Optional email (you already had this)
+            // Order confirmation email
             if (order?.buyer_email && resend) {
               try {
                 await resend.emails.send({
-                  from: "Store <orders@yourdomain.com>",
+                  from: "Mierabeauty <noreply@mierabeauty.com>",
                   to: order.buyer_email,
                   subject: `Order ${order.id} confirmed`,
                   html: `
-                    <h2>Obrigado pela compra!</h2>
-                    <p>Seu pedido <strong>${order.id}</strong> foi confirmado.</p>
+                    <h2>Thank you for your order!</h2>
+                    <p>Your order <strong>${order.id}</strong> has been confirmed.</p>
                     <p>Total: €${(order.subtotal_cents / 100).toFixed(2)}</p>
                   `,
                 });
