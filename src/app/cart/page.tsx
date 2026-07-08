@@ -83,7 +83,7 @@ export default function CartPage() {
       {!hasItems ? (
         <div className="rounded-md border border-gray-200 p-8 text-center bg-white">
           <p className="z-label mb-4">Your cart is empty.</p>
-          <Link href="/list" className="z-btn z-btn--secondary">
+          <Link href="/shop" className="z-btn z-btn--secondary">
            Back to Shop
           </Link>
         </div>
@@ -168,7 +168,7 @@ export default function CartPage() {
               >
                Clear Cart
               </button>
-              <Link href="/list" className="z-btn z-btn--secondary">
+              <Link href="/shop" className="z-btn z-btn--secondary">
                 Keep Shopping
               </Link>
             </div>

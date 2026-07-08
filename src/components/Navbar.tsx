@@ -60,7 +60,7 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
             <div className={`hidden xl:flex gap-6 m-title-sm transition-colors duration-300 ${linkColor}`}>
               {[
                 { href: "/",       label: "Homepage" },
-                { href: "/list",   label: "Shop"     },
+                { href: "/shop",   label: "Shop"     },
                 { href: "/about",  label: "About"    },
                 { href: "/gallery",label: "Tutorials"},
               ].map(({ href, label }) => (

@@ -61,7 +61,7 @@ const Menu = ({ categories = [] }: { categories?: Category[] }) => {
             </Link>
           </li>
           <li>
-            <Link href="/list" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
+            <Link href="/shop" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
               Shop
             </Link>
           </li>
@@ -84,7 +84,7 @@ const Menu = ({ categories = [] }: { categories?: Category[] }) => {
               {shopCategories.map((c) => (
                 <li key={c.id}>
                   <Link
-                    href={`/list?cat=${c.slug}`}
+                    href={`/shop?cat=${c.slug}`}
                     onClick={() => setOpen(false)}
                     className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1"
                   >

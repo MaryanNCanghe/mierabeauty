@@ -56,7 +56,7 @@ export default function MobileInlineSearch({
     e.preventDefault();
     const q = value.trim();
     if (q) {
-      router.push(`/list?name=${encodeURIComponent(q)}`);
+      router.push(`/shop?name=${encodeURIComponent(q)}`);
     }
     // Close after searching
     setOpen(false);

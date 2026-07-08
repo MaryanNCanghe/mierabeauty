@@ -29,7 +29,7 @@ const CategoryList = async () => {
         <div className="flex gap-4 md:gap-8">
           {(cats ?? []).map((item) => (
             <Link
-              href={`/list?cat=${item.slug}`}
+              href={`/shop?cat=${item.slug}`}
               className="flex-shrink-0 w-1/2 sm:w-1/3 lg:w-1/4 snap-start"
               key={item.id}
             >

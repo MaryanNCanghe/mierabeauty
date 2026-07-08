@@ -29,7 +29,7 @@ const SearchBar = ({ onClose }: Props) => {
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const name = (new FormData(e.currentTarget).get("name") as string)?.trim();
-    if (name) router.push(`/list?name=${encodeURIComponent(name)}`);
+    if (name) router.push(`/shop?name=${encodeURIComponent(name)}`);
     onClose?.();
   };
 
