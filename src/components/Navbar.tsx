@@ -2,23 +2,34 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Menu from "./Menu";
 import NavIcons from "./NavIcons";
 import MobileInlineSearch from "./MobileInlineSearch";
 import SearchBar from "./SearchBar";
+import CurrencySwitcher from "./CurrencySwitcher";
 import type { Category } from "@/lib/categories";
 
+// Routes with a full-bleed dark hero directly under the navbar —
+// everywhere else has a light background at the top, so white text
+// would be unreadable before the user scrolls.
+const HAS_DARK_HERO = new Set(["/", "/about"]);
+
 const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  const overDarkHero = HAS_DARK_HERO.has(pathname) && !scrolled;
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [pathname]);
 
-  const linkColor = scrolled ? "text-[var(--m-black)]" : "text-white";
+  const linkColor = overDarkHero ? "text-white" : "text-[var(--m-black)]";
 
   return (
     <div
@@ -35,7 +46,7 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
         {/* MOBILE */}
         <div className="md:hidden h-full grid grid-cols-3 items-center gap-2">
           <Link href="/">
-            <span className="font-display text-base leading-none tracking-widest truncate text-[var(--m-black)]">
+            <span className={`font-display text-base leading-none tracking-widest truncate transition-colors duration-300 ${linkColor}`}>
               MIERA
             </span>
           </Link>
@@ -43,8 +54,9 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
             <MobileInlineSearch />
           </div>
           <div className="flex items-center justify-end gap-2">
-            <NavIcons />
-            <Menu categories={categories} />
+            <CurrencySwitcher light={overDarkHero} />
+            <NavIcons light={overDarkHero} />
+            <Menu categories={categories} light={overDarkHero} />
           </div>
         </div>
 
@@ -53,13 +65,13 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
           {/* LEFT: brand + nav links */}
           <div className="flex items-center gap-10">
             <Link href="/">
-              <span className="font-display text-xl lg:text-2xl leading-none tracking-widest text-[var(--m-black)]">
+              <span className={`font-display text-xl lg:text-2xl leading-none tracking-widest transition-colors duration-300 ${linkColor}`}>
                 MIERA
               </span>
             </Link>
             <div className={`hidden xl:flex gap-6 m-title-sm transition-colors duration-300 ${linkColor}`}>
               {[
-                { href: "/",       label: "Homepage" },
+                { href: "/",       label: "Home" },
                 { href: "/shop",   label: "Shop"     },
                 { href: "/about",  label: "About"    },
                 { href: "/gallery",label: "Tutorials"},
@@ -94,8 +106,9 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
                 </svg>
               )}
             </button>
-            <NavIcons />
-            <Menu categories={categories} />
+            <CurrencySwitcher light={overDarkHero} />
+            <NavIcons light={overDarkHero} />
+            <Menu categories={categories} light={overDarkHero} />
           </div>
         </div>
       </div>

@@ -12,16 +12,25 @@ export default function PolicyPage() {
         </h2>
         <div className="space-y-3 text-sm font-light text-[var(--m-muted)] leading-relaxed">
           <p>
-            We process orders within <strong className="text-[var(--m-black)]">1 to 2 business days</strong>. Delivery
-            usually takes <strong className="text-[var(--m-black)]">3 to 7 business days</strong>.
+            We process orders within <strong className="text-[var(--m-black)]">1 to 3 business days</strong>. Standard
+            delivery usually takes <strong className="text-[var(--m-black)]">7 to 15 business days</strong>, depending
+            on your location and carrier volumes.
+          </p>
+          <p>
+            <strong className="text-[var(--m-black)]">Pre-order items</strong> take longer than standard delivery —
+            the expected timeframe is shown on the product page and at checkout before you confirm your order.
           </p>
           <p>
             Tracking will be emailed once your order ships. Times may vary due to
-            carrier delays or peak seasons.
+            carrier delays, customs, or peak seasons.
           </p>
           <p>
             Shipping rates are calculated at checkout. Free shipping thresholds
             (if any) are shown at checkout.
+          </p>
+          <p>
+            <strong className="text-[var(--m-black)]">Buyer Protection:</strong> if your order doesn&apos;t arrive,
+            arrives damaged, or isn&apos;t as described, we&apos;ll issue a full refund or replacement — no questions asked.
           </p>
           <p>
             For delivery issues, contact us at{" "}
@@ -39,8 +48,8 @@ export default function PolicyPage() {
         </h2>
         <div className="space-y-3 text-sm font-light text-[var(--m-muted)] leading-relaxed">
           <p>
-            Returns accepted within <strong className="text-[var(--m-black)]">30 days</strong> for unopened items in
-            original packaging (unless Final Sale).
+            Returns accepted within <strong className="text-[var(--m-black)]">90 days</strong> of delivery for unopened
+            items in original packaging (unless Final Sale).
           </p>
           <p>
             Start a return by emailing{" "}
@@ -50,8 +59,8 @@ export default function PolicyPage() {
             <strong className="text-[var(--m-black)]">5 to 10 business days</strong> after inspection.
           </p>
           <p>
-            Shipping fees are non-refundable unless the item was defective. Exchanges are subject
-            to stock availability.
+            Shipping fees are non-refundable unless the item was defective or covered by Buyer Protection.
+            Exchanges are subject to stock availability.
           </p>
         </div>
       </section>
@@ -78,6 +87,29 @@ export default function PolicyPage() {
           </p>
           <p>
             We may update this policy periodically; continued use of the site indicates consent.
+          </p>
+        </div>
+      </section>
+
+      {/* Cookie Policy */}
+      <section id="cookies" className="mb-10">
+        <h2 className="m-label text-[var(--m-gold)] mb-4 uppercase tracking-widest">
+          Cookie Policy
+        </h2>
+        <div className="space-y-3 text-sm font-light text-[var(--m-muted)] leading-relaxed">
+          <p>
+            We use essential cookies to keep you signed in, remember your cart, and process
+            checkout securely. We also use cookies to understand site usage and improve the
+            shopping experience.
+          </p>
+          <p>
+            By continuing to browse, or by accepting cookies via the banner shown on your first
+            visit, you consent to this use. You can clear cookies at any time through your browser
+            settings.
+          </p>
+          <p>
+            By placing an order, you confirm you have read and agree to this Cookie Policy and to
+            our Terms &amp; Conditions.
           </p>
         </div>
       </section>
@@ -117,7 +149,7 @@ export default function PolicyPage() {
               hello@mierabeauty.com
             </a>.
           </p>
-          <p className="text-[var(--m-subtle)]">Last updated: January 6, 2026</p>
+          <p className="text-[var(--m-subtle)]">Last updated: July 10, 2026</p>
         </div>
       </section>
     </section>

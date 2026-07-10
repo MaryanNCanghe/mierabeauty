@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/contexts/cart";
+import { useCurrency } from "@/contexts/currency";
 
 type CartItem = {
   productId: string;
@@ -14,6 +15,7 @@ type CartItem = {
   attributes?: {
     color?: string;
     size?: string;
+    preorder?: string;
   };
 };
 
@@ -45,6 +47,7 @@ export default function CartPage() {
       attributes?: CartItem["attributes"];
     }) => void;
   };
+  const { format } = useCurrency();
 
   const hasItems = items.length > 0;
 
@@ -111,7 +114,7 @@ export default function CartPage() {
                     <div className="flex items-start justify-between gap-4">
                       <h3 className="z-title-sm leading-tight">{it.name}</h3>
                       <div className="px-2 py-1 bg-gray-50 rounded-sm z-label-1">
-                        €{(it.priceCents / 100).toFixed(2)}
+                        {format(it.priceCents)}
                       </div>
                     </div>
 
@@ -124,7 +127,13 @@ export default function CartPage() {
                         </div>
                       )}
 
-                    <div className="text-xs text-green-600 mt-1">Available</div>
+                    {it.attributes?.preorder ? (
+                      <div className="text-xs text-[var(--m-gold)] mt-1">
+                        Pre-Order — ships later
+                      </div>
+                    ) : (
+                      <div className="text-xs text-green-600 mt-1">Available</div>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between pt-4">
@@ -181,7 +190,7 @@ export default function CartPage() {
 
               <div className="z-title-md flex items-center justify-between z-label mb-2">
                 <span>Subtotal</span>
-                <span>€{(subtotalCents / 100).toFixed(2)}</span>
+                <span>{format(subtotalCents)}</span>
               </div>
 
               <p className="z-label text-gray-500 mb-4">

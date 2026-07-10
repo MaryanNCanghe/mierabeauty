@@ -356,10 +356,7 @@ create index if not exists idx_profiles_user        on profiles(user_id);
 insert into categories (slug, name) values
   ('beauty',         'Beauty'),
   ('hair',           'Hair'),
-  ('makeup',         'Makeup'),
-  ('skincare',       'Skincare'),
-  ('accessories',    'Accessories'),
-  ('mens-hair-care', 'Men''s Hair Care')
+  ('makeup',         'Makeup')
 on conflict (slug) do nothing;
 
 -- Subcategories — each row resolves its parent by slug
@@ -376,10 +373,8 @@ from (values
   ('bundles-weaves',      'Bundles & Weaves',        'hair'),
   ('closures-frontals',   'Closures & Frontals',     'hair'),
   ('virgin-human-hair',   'Virgin Human Hair',       'hair'),
-  ('synthetic-hair',      'Synthetic Hair',          'hair'),
   ('clip-ins',            'Clip-Ins',                'hair'),
   ('ponytails',           'Ponytails',               'hair'),
-  ('braiding-hair',       'Braiding Hair',           'hair'),
 
   ('foundation',          'Foundation',              'makeup'),
   ('concealer',           'Concealer',               'makeup'),
@@ -389,30 +384,7 @@ from (values
   ('eyeliner-mascara',    'Eyeliner & Mascara',      'makeup'),
   ('lashes-brows',        'Lashes & Brows',          'makeup'),
   ('lipstick-gloss',      'Lipstick & Lip Gloss',    'makeup'),
-  ('makeup-brushes-tools','Makeup Brushes & Tools',  'makeup'),
-
-  ('cleansers',           'Cleansers',               'skincare'),
-  ('toners',              'Toners',                  'skincare'),
-  ('serums-treatments',   'Serums & Treatments',     'skincare'),
-  ('moisturizers',        'Moisturizers',            'skincare'),
-  ('sunscreen',           'Sunscreen (SPF)',         'skincare'),
-  ('face-masks',          'Face Masks',              'skincare'),
-  ('exfoliants',          'Exfoliants',              'skincare'),
-  ('eye-care',            'Eye Care',                'skincare'),
-
-  ('edge-control-gel',    'Edge Control & Gel',      'accessories'),
-  ('hair-glue-adhesive',  'Hair Glue & Adhesive',    'accessories'),
-  ('wig-caps-liners',     'Wig Caps & Liners',       'accessories'),
-  ('wavy-combs-brushes',  'Wavy Combs & Brushes',    'accessories'),
-  ('edge-brushes',        'Edge Brushes',            'accessories'),
-  ('hair-clips-pins',     'Hair Clips & Pins',       'accessories'),
-  ('rollers-curlers',     'Rollers & Curlers',       'accessories'),
-
-  ('beard-care',          'Beard Care',              'mens-hair-care'),
-  ('pomade-styling',      'Pomade & Styling',        'mens-hair-care'),
-  ('clippers-trimmers',   'Clippers & Trimmers',     'mens-hair-care'),
-  ('grooming-kits',       'Grooming Kits',           'mens-hair-care'),
-  ('cologne-aftershave',  'Cologne & Aftershave',    'mens-hair-care')
+  ('makeup-brushes-tools','Makeup Brushes & Tools',  'makeup')
 ) as v(slug, name, parent_slug)
 join categories p on p.slug = v.parent_slug
 on conflict (slug) do nothing;
@@ -454,5 +426,5 @@ create policy "public_read_product_images_storage"
 --           immutable user_id guard
 -- Indexes : covering all filter/sort/join columns + GIN trigram on name
 -- Storage : product-images bucket (public read, service_role write)
--- Seed    : category taxonomy — Beauty, Hair, Makeup, Skincare,
---           Accessories, Men's Hair Care + subcategories (categories.parent_id)
+-- Seed    : category taxonomy — Beauty, Hair, Makeup + subcategories
+--           (categories.parent_id)

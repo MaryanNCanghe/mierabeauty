@@ -3,9 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/contexts/cart";
+import { useCurrency } from "@/contexts/currency";
 
 export default function CartModal() {
   const { items, removeItem, subtotalCents, clear } = useCart();
+  const { format } = useCurrency();
 
   return (
     <div className="w-max absolute p-4 rounded-md shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white top-12 right-0 flex flex-col gap-4 z-20">
@@ -33,7 +35,7 @@ export default function CartModal() {
                 <div className="flex items-center justify-between gap-8">
                   <h3 className="font-semibold">{it.name}</h3>
                   <div className="p-1 bg-gray-50 rounded-sm">
-                    €{(it.priceCents / 100).toFixed(2)}
+                    {format(it.priceCents)}
                   </div>
                 </div>
 
@@ -46,7 +48,13 @@ export default function CartModal() {
                     </div>
                   )}
 
-                <div className="text-sm text-gray-500">Available</div>
+                {it.attributes?.preorder ? (
+                  <div className="text-sm text-[var(--m-gold)]">
+                    Pre-Order — ships later
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">Available</div>
+                )}
               </div>
 
               <div className="flex justify-between text-sm pt-6">
@@ -69,7 +77,7 @@ export default function CartModal() {
       <div>
         <div className="flex items-center justify-between z-title-sm">
           <span>Subtotal</span>
-          <span>€{(subtotalCents / 100).toFixed(2)}</span>
+          <span>{format(subtotalCents)}</span>
         </div>
 
         <p className="z-label mt-2 mb-4">

@@ -8,7 +8,7 @@ import { useCart } from "@/contexts/cart";
 import { supabaseClient } from "@/lib/supabase/client";
 import CartModal from "@/components/CartModal";
 
-function NavIcons() {
+function NavIcons({ light = false }: { light?: boolean }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -76,7 +76,7 @@ function NavIcons() {
             alt="Profile"
             width={22}
             height={22}
-            className="cursor-pointer"
+            className={`cursor-pointer transition-[filter] duration-300 ${light ? "brightness-0 invert" : ""}`}
             onClick={() => setIsProfileOpen(prev => !prev)}
           />
 
@@ -96,7 +96,7 @@ function NavIcons() {
           )}
         </div>
       ) : (
-        <Link href="/login" className="text-sm z-label-1 hover:underline">
+        <Link href="/login" className={`text-sm z-label-1 hover:underline transition-colors duration-300 ${light ? "text-white" : ""}`}>
           Login
         </Link>
       )}
@@ -107,7 +107,13 @@ function NavIcons() {
         onClick={() => setIsCartOpen(prev => !prev)}
         aria-label={`Cart (${totalItems})`}
       >
-        <Image src="/cart.png" alt="Cart" width={22} height={22} />
+        <Image
+          src="/cart.png"
+          alt="Cart"
+          width={22}
+          height={22}
+          className={`transition-[filter] duration-300 ${light ? "brightness-0 invert" : ""}`}
+        />
 
         {totalItems > 0 && (
           <div className="absolute -top-3 -right-3 min-w-6 h-5 rounded-full bg-red-600 text-white text-sm flex items-center justify-center px-1">

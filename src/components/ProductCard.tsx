@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useCurrency } from "@/contexts/currency";
 
 export type ProductCardData = {
   id: number;
@@ -18,15 +19,12 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
   const { slug, name, description, price_cents, images, isNew } = product;
   const [activeIdx, setActiveIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
+  const { format } = useCurrency();
 
   // On hover switch to second image (if available), else stay on active
   const displayIdx = hovered && images.length > 1 ? (activeIdx === 0 ? 1 : 0) : activeIdx;
 
-  const price = (price_cents / 100).toLocaleString("en-IE", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 2,
-  });
+  const price = format(price_cents);
 
   return (
     <Link href={`/${slug}`} className="group block">

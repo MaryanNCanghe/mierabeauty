@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import type { Category } from "@/lib/categories";
 import { topLevelCategories } from "@/lib/categories";
 
-const Menu = ({ categories = [] }: { categories?: Category[] }) => {
+const Menu = ({ categories = [], light = false }: { categories?: Category[]; light?: boolean }) => {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const shopCategories = topLevelCategories(categories);
@@ -108,6 +108,7 @@ const Menu = ({ categories = [] }: { categories?: Category[] }) => {
         width={24}
         height={24}
         onClick={() => setOpen((prev) => !prev)}
+        className={`cursor-pointer transition-[filter] duration-300 ${light ? "brightness-0 invert" : ""}`}
         priority
       />
 

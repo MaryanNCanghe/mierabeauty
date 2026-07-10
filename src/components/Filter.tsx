@@ -75,15 +75,6 @@ export default function Filter({ categories, isOpen, onClose }: Props) {
   const [max,  setMax]  = useState(searchParams.get("max")  ?? "");
 
   const categoryTree = buildCategoryTree(categories);
-  const [expanded, setExpanded] = useState<Record<number, boolean>>(() =>
-    Object.fromEntries(
-      categoryTree
-        .filter((parent) => parent.children.some((child) => child.slug === cat))
-        .map((parent) => [parent.id, true])
-    )
-  );
-  const toggleExpanded = (id: number) =>
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const activeCount = [cat, sort, min, max].filter(Boolean).length;
 
@@ -176,18 +167,8 @@ export default function Filter({ categories, isOpen, onClose }: Props) {
                     <FilterDot active={cat === parent.slug} />
                     {parent.name ?? parent.slug}
                   </button>
-                  {parent.children.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => toggleExpanded(parent.id)}
-                      aria-label={expanded[parent.id] ? `Collapse ${parent.name}` : `Expand ${parent.name}`}
-                      className="p-1 text-[var(--m-subtle)] hover:text-[var(--m-black)]"
-                    >
-                      <ChevronIcon open={!!expanded[parent.id]} />
-                    </button>
-                  )}
                 </div>
-                {parent.children.length > 0 && expanded[parent.id] && (
+                {parent.children.length > 0 && (
                   <div className="flex flex-col gap-2.5 mt-2.5 ml-4">
                     {parent.children.map((child) => (
                       <button

@@ -58,3 +58,39 @@ export function formatAmount(cents: number, currency: string): string {
   const amount = zeroDecimal ? cents : cents / 100;
   return `${symbol}${amount.toLocaleString(undefined, { minimumFractionDigits: zeroDecimal ? 0 : 2, maximumFractionDigits: zeroDecimal ? 0 : 2 })}`;
 }
+
+// ── Storefront currency switcher ──────────────────────────────────
+// All prices are stored in the database as EUR cents. These are the
+// only currencies the storefront lets shoppers switch between; rates
+// are static (approximate, EUR-based) and should be refreshed
+// periodically rather than pulled from a live FX feed.
+export const SUPPORTED_CURRENCIES = ["nok", "eur", "usd"] as const;
+export type SupportedCurrency = (typeof SUPPORTED_CURRENCIES)[number];
+
+export const CURRENCY_LABEL: Record<SupportedCurrency, string> = {
+  nok: "NOK",
+  eur: "EUR",
+  usd: "USD",
+};
+
+// Units of currency per 1 EUR (static reference rates).
+const EUR_EXCHANGE_RATE: Record<SupportedCurrency, number> = {
+  eur: 1,
+  nok: 11.7,
+  usd: 1.09,
+};
+
+export function isSupportedCurrency(value: string): value is SupportedCurrency {
+  return (SUPPORTED_CURRENCIES as readonly string[]).includes(value);
+}
+
+// Converts a EUR-cents amount (the DB's base unit) into the target
+// currency's smallest unit, rounded to the nearest cent.
+export function convertEurCents(eurCents: number, currency: SupportedCurrency): number {
+  return Math.round(eurCents * EUR_EXCHANGE_RATE[currency]);
+}
+
+// Converts + formats a EUR-cents amount in one step.
+export function formatEurCents(eurCents: number, currency: SupportedCurrency): string {
+  return formatAmount(convertEurCents(eurCents, currency), currency);
+}

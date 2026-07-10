@@ -4,7 +4,9 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CookieConsent from "@/components/CookieConsent";
 import { CartProvider } from "@/contexts/cart";
+import { CurrencyProvider } from "@/contexts/currency";
 import { supabaseServer } from "@/lib/supabase/server";
 
 const cormorant = Cormorant_Garamond({
@@ -36,11 +38,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${cormorant.variable} ${dmSans.variable} min-h-screen flex flex-col`}>
-        <CartProvider>
-          <Navbar categories={categories ?? []} />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </CartProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <Navbar categories={categories ?? []} />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <CookieConsent />
+          </CartProvider>
+        </CurrencyProvider>
       </body>
     </html>
   );

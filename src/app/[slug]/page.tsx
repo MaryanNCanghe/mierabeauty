@@ -5,15 +5,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import ProductImages, { ProductImageItem } from '@/components/ProductImages';
 import ClientProductControls from '@/components/ClientProductControls';
 import ProductListSupabase from '@/components/ProductList';
-
-function formatEUR(cents?: number | null) {
-  if (cents == null) return '€0,00';
-  return new Intl.NumberFormat('en-IE', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(cents / 100);
-}
+import PriceTag from '@/components/PriceTag';
 
 // Monta URL pública do Storage se vier apenas caminho; mantém URLs absolutas (http...)
 function resolveImageUrl(url: string): string {
@@ -119,7 +111,7 @@ export default async function SinglePage({ params }: { params: { slug: string } 
 
           {/* Price */}
           <p className="font-display text-2xl font-light text-[var(--m-black)]">
-            {formatEUR(leadingPriceCents)}
+            <PriceTag eurCents={leadingPriceCents} />
           </p>
 
           <div className="h-px bg-[var(--m-gold)]/20" />

@@ -4,6 +4,7 @@
 import { useMemo, useState } from "react";
 import CustomizeProducts from "@/components/CustomizeProducts";
 import Add from "@/components/Add";
+import { useCurrency } from "@/contexts/currency";
 
 export default function ClientProductControls({
   product,
@@ -17,6 +18,7 @@ export default function ClientProductControls({
     () => variants.find((v) => v.id === selectedVariantId) ?? variants[0],
     [variants, selectedVariantId]
   );
+  const { format } = useCurrency();
 
   return (
     <>
@@ -35,12 +37,8 @@ export default function ClientProductControls({
         selectedVariantId={selectedVariantId} // controlado
       />
 
-      {/* preço dinâmico (opcional) */}
       <div className="z-label text-gray-600">
-        Preço da variante:{" "}
-        {new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(
-          (selectedVariant?.priceCents ?? 0) / 100
-        )}
+        Variant price: {format(selectedVariant?.priceCents ?? 0)}
       </div>
     </>
   );

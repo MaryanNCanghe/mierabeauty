@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import PaymentSection from "@/components/PaymentSection";
 import { useCart } from "@/contexts/cart";
+import { useCurrency } from "@/contexts/currency";
 import Link from "next/link";
-import { currencyForCountry, symbolForCurrency } from "@/lib/countryCurrency";
 
 // Validador simples de UUID
 const UUID_RE =
@@ -12,6 +12,7 @@ const UUID_RE =
 
 export default function CheckoutPage() {
   const { items, subtotalCents } = useCart();
+  const { currency, convert, format } = useCurrency();
 
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -47,15 +48,8 @@ export default function CheckoutPage() {
     );
   }, [shipping]);
 
-  const currency = useMemo(
-    () => /^[A-Z]{2}$/i.test(shipping.country)
-      ? currencyForCountry(shipping.country)
-      : "eur",
-    [shipping.country]
-  );
-  const currencySymbol = symbolForCurrency(currency);
-
   const canContinue = items.length > 0 && contactValid && shippingValid;
+  const hasPreorder = items.some((it) => (it as any).attributes?.preorder);
 
   const handleContinue = async () => {
     try {
@@ -80,11 +74,13 @@ export default function CheckoutPage() {
               : null;
         }
 
+        // Prices are stored in the DB (and in the cart) as EUR cents —
+        // convert to the shopper's selected currency before charging.
         return {
           productId: productIdNum,
           variantId,
           name: it.name,
-          priceCents: Number(it.priceCents) || 0,
+          priceCents: convert(Number(it.priceCents) || 0),
           qty: Number(it.qty) || 0,
           imageUrl: it.imageUrl ?? null,
           attributes: it.attributes ?? null,
@@ -205,11 +201,6 @@ export default function CheckoutPage() {
                   >
                     <label htmlFor={`shipping-${key}`} className="z-label block mb-1">
                       {label}
-                      {key === "country" && shipping.country.length === 2 && (
-                        <span className="ml-2 text-xs font-mono text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                          {currency.toUpperCase()} {currencySymbol}
-                        </span>
-                      )}
                     </label>
                     <input
                       id={`shipping-${key}`}
@@ -271,10 +262,19 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between z-label-1 mb-2">
                 <span>Subtotal</span>
-                <span>{currencySymbol}{(subtotalCents / 100).toFixed(2)}</span>
+                <span>{format(subtotalCents)}</span>
               </div>
 
-              <p className="z-label text-gray-500 mb-4">tax 25%</p>
+              <p className="z-label text-gray-500 mb-4">
+                tax 25% &middot; charged in {currency.toUpperCase()}
+              </p>
+
+              {hasPreorder && (
+                <p className="z-label text-[var(--m-gold)] mb-4">
+                  Your order includes a pre-order item — it will take longer than
+                  standard delivery to arrive.
+                </p>
+              )}
 
               <Link href="/cart" className="z-link">
                 Return to cart

@@ -1,6 +1,7 @@
 
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
@@ -12,9 +13,10 @@ function InnerPayment({ clientSecret, orderId }: { clientSecret: string; orderId
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [agreed, setAgreed] = useState(false);
 
   const handlePay = async () => {
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || !agreed) return;
     setLoading(true);
 
     const { error } = await stripe.confirmPayment({
@@ -31,10 +33,33 @@ function InnerPayment({ clientSecret, orderId }: { clientSecret: string; orderId
   return (
     <div>
       <PaymentElement />
+
+      <label className="flex items-start gap-2 mt-4 text-sm text-gray-700 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-0.5"
+          required
+        />
+        <span>
+          I have read and agree to the{" "}
+          <Link href="/policy#cookies" className="z-link" target="_blank">
+            Cookie Policy
+          </Link>{" "}
+          and{" "}
+          <Link href="/policy" className="z-link" target="_blank">
+            Terms &amp; Conditions
+          </Link>
+          .
+        </span>
+      </label>
+
       <button
-        className={`z-btn z-btn--primary mt-4 ${loading ? "opacity-50" : ""}`}
+        type="button"
+        className={`z-btn z-btn--primary mt-4 ${loading || !agreed ? "opacity-50" : ""}`}
         onClick={handlePay}
-        disabled={loading || !stripe || !elements}
+        disabled={loading || !stripe || !elements || !agreed}
       >
         Pay Now
       </button>

@@ -31,14 +31,15 @@ export default function Add(props: {
   const [quantity, setQuantity] = useState(1);
 
   const stock = selectedVariant?.stock ?? 0;
-  const canDecrease = quantity > 1;
-  const canIncrease = quantity < stock;
   const isOutOfStock = stock < 1;
+  const MAX_PREORDER_QTY = 10;
+  const canDecrease = quantity > 1;
+  const canIncrease = isOutOfStock ? quantity < MAX_PREORDER_QTY : quantity < stock;
 
   function addToCart(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (!selectedVariant || isOutOfStock || quantity < 1) return;
+    if (!selectedVariant || quantity < 1) return;
 
     cart.addItem(
       {
@@ -48,7 +49,11 @@ export default function Add(props: {
         name,
         priceCents: selectedVariant.priceCents,
         imageUrl,
-        attributes: { color: selectedVariant.color, size: selectedVariant.size },
+        attributes: {
+          color: selectedVariant.color,
+          size: selectedVariant.size,
+          ...(isOutOfStock ? { preorder: "true" } : {}),
+        },
       },
       quantity
     );
@@ -82,16 +87,19 @@ export default function Add(props: {
           </div>
 
           {isOutOfStock && (
-            <div className="text-xs">Product is out of stock</div>
+            <div className="text-xs text-[var(--m-muted)]">
+              Currently sold out — pre-order takes longer to arrive
+            </div>
           )}
         </div>
 
         <button
+          type="button"
           onClick={addToCart}
-          disabled={isOutOfStock || quantity < 1}
+          disabled={quantity < 1}
           className="w-36 z-label-1 z-btn--primary disabled:cursor-not-allowed disabled:bg-grey-200 disabled:ring-0 disabled:text-white"
         >
-          Add to Cart
+          {isOutOfStock ? "Pre-Order" : "Add to Cart"}
         </button>
       </div>
     </div>
