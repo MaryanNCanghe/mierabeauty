@@ -6,6 +6,7 @@ import ProductImages, { ProductImageItem } from '@/components/ProductImages';
 import ClientProductControls from '@/components/ClientProductControls';
 import ProductListSupabase from '@/components/ProductList';
 import PriceTag from '@/components/PriceTag';
+import { customizerModeForCategorySlug } from '@/lib/hairCustomization';
 
 // Monta URL pública do Storage se vier apenas caminho; mantém URLs absolutas (http...)
 function resolveImageUrl(url: string): string {
@@ -44,6 +45,21 @@ export default async function SinglePage({ params }: { params: { slug: string } 
     .order('id', { ascending: true });
 
   if (varErr) console.warn('Failed to load variants:', varErr.message);
+
+  // Resolve this product's Hair subcategory (if any) to decide customizer mode.
+  const { data: catLinks, error: catLinkErr } = await supabase
+    .from('product_categories')
+    .select('categories(slug, name, parent_id)')
+    .eq('product_id', product.id);
+
+  if (catLinkErr) console.warn('Failed to load product categories:', catLinkErr.message);
+
+  const hairCategory = (catLinks ?? [])
+    .map((l: any) => l.categories)
+    .find((c: any) => c && c.parent_id != null);
+
+  const categoryName: string = hairCategory?.name ?? 'Hair';
+  const customizerMode = customizerModeForCategorySlug(hairCategory?.slug ?? null);
 
   // Constrói itens de imagem com URL absoluta
   const hasGallery = Array.isArray(images) && images.length > 0;
@@ -91,10 +107,10 @@ export default async function SinglePage({ params }: { params: { slug: string } 
         <div className="w-full lg:w-1/2 flex flex-col gap-6">
 
           {/* Breadcrumb-style label */}
-          <span className="m-label text-[var(--m-gold)]">Beauty</span>
+          <span className="m-label text-[var(--m-gold)]">{categoryName}</span>
 
           {/* Product title — Cormorant display */}
-          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-light leading-tight text-[var(--m-black)]">
+          <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-light leading-tight text-[var(--m-black)]">
             {product.name}
           </h1>
 
@@ -110,7 +126,7 @@ export default async function SinglePage({ params }: { params: { slug: string } 
           <div className="h-px bg-[var(--m-gold)]/20" />
 
           {/* Price */}
-          <p className="font-display text-2xl font-light text-[var(--m-black)]">
+          <p className="font-display text-xl font-light text-[var(--m-black)]">
             <PriceTag eurCents={leadingPriceCents} />
           </p>
 
@@ -129,6 +145,7 @@ export default async function SinglePage({ params }: { params: { slug: string } 
                 ? variantItems
                 : [{ id: product.id, priceCents: product.price_cents, stock: 9999 }]
             }
+            customizerMode={customizerMode}
           />
 
           <div className="h-px bg-[var(--m-gold)]/20" />

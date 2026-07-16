@@ -92,7 +92,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-xl px-6 py-20">
           <div className="text-center mb-10">
             <span className="m-label text-[var(--m-gold)]">Get in touch</span>
-            <h2 className="font-display text-3xl md:text-4xl font-light mt-3 text-[var(--m-black)]">
+            <h2 className="font-display text-2xl md:text-3xl font-light mt-3 text-[var(--m-black)]">
               Contact Us
             </h2>
             <p className="m-label text-[var(--m-muted)] mt-3">

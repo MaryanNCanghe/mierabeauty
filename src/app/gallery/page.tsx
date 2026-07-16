@@ -161,7 +161,7 @@ export default function GalleryPage() {
       {/* Header */}
       <header className="w-full px-4 sm:px-6 lg:px-16 pt-10 pb-6">
         <span className="m-label text-[var(--m-gold)]">Learn With Us</span>
-        <h1 className="font-display text-4xl md:text-5xl font-light mt-2 text-[var(--m-black)]">
+        <h1 className="font-display text-3xl md:text-4xl font-light mt-2 text-[var(--m-black)]">
           Tutorials
         </h1>
         <p className="z-label-1 mt-3 max-w-xl text-[var(--m-muted)]">
@@ -340,7 +340,7 @@ function Lightbox({
           </button>
 
           <span className="m-label text-[var(--m-gold)]">{item.category}</span>
-          <h2 className="font-display text-2xl md:text-3xl font-light text-white">{item.title}</h2>
+          <h2 className="font-display text-xl md:text-2xl font-light text-white">{item.title}</h2>
           <hr className="m-divider" />
           <p className="text-white/80 text-sm leading-relaxed">{item.description}</p>
 

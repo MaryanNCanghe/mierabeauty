@@ -94,3 +94,9 @@ export function convertEurCents(eurCents: number, currency: SupportedCurrency): 
 export function formatEurCents(eurCents: number, currency: SupportedCurrency): string {
   return formatAmount(convertEurCents(eurCents, currency), currency);
 }
+
+// Converts a USD amount (e.g. a surcharge quoted in dollars) into EUR-cents,
+// using the same static reference rate as everything else in this file.
+export function usdToEurCents(usdAmount: number): number {
+  return Math.round((usdAmount * 100) / EUR_EXCHANGE_RATE.usd);
+}

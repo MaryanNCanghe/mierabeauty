@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/contexts/cart";
 import { useCurrency } from "@/contexts/currency";
+import { formatCartAttributesLine, computeGramsTotal } from "@/lib/hairCustomization";
 
 export default function CartModal() {
   const { items, removeItem, subtotalCents, clear } = useCart();
@@ -39,14 +40,17 @@ export default function CartModal() {
                   </div>
                 </div>
 
-                {it.attributes &&
-                  (it.attributes.color || it.attributes.size) && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      {[it.attributes.color, it.attributes.size]
-                        .filter(Boolean)
-                        .join(" / ")}
-                    </div>
-                  )}
+                {it.attributes && formatCartAttributesLine(it.attributes) && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    {formatCartAttributesLine(it.attributes)}
+                  </div>
+                )}
+
+                {it.attributes?.gramsMode && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    {computeGramsTotal(it.qty)}g total
+                  </div>
+                )}
 
                 {it.attributes?.preorder ? (
                   <div className="text-sm text-[var(--m-gold)]">

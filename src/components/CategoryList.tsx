@@ -16,7 +16,7 @@ const DISPLAY_NAME: Record<string, string> = {
 
 // Subcategories hidden from the homepage catalogue only — they still
 // exist as filter options on the Shop page.
-const HIDDEN_ON_HOME = new Set(["closures-frontals", "hair-growth", "full-lace-wigs"]);
+const HIDDEN_ON_HOME = new Set(["closures-frontals", "hair-growth", "full-lace-wigs", "ponytails"]);
 
 // Preferred display order; unlisted slugs are appended afterwards.
 const ORDER = [
@@ -24,7 +24,6 @@ const ORDER = [
   "lace-front-wigs",
   "bundles-weaves",
   "clip-ins",
-  "ponytails",
 ];
 
 const CategoryList = async () => {
@@ -64,6 +63,7 @@ const CategoryList = async () => {
       ...c,
       displayName: DISPLAY_NAME[c.slug] ?? c.name,
       displayImage: c.image_url ?? fallbackImages[c.id] ?? null,
+      isCustomTile: false,
     }))
     .sort((a, b) => {
       const ai = ORDER.indexOf(a.slug);
@@ -73,6 +73,18 @@ const CategoryList = async () => {
       if (bi === -1) return -1;
       return ai - bi;
     });
+
+  // Synthetic tile — not a DB category, links to the build-your-own configurator.
+  cats.push({
+    id: -1,
+    slug: "custom",
+    name: "Build Your Own",
+    parent_id: hair?.id ?? null,
+    image_url: null,
+    displayName: "Build Your Own",
+    displayImage: null,
+    isCustomTile: true,
+  });
 
   if (!cats?.length) return null;
 
@@ -86,19 +98,29 @@ const CategoryList = async () => {
         <div className="flex gap-4 md:gap-8">
           {(cats ?? []).map((item) => (
             <Link
-              href={`/shop?cat=${item.slug}`}
+              href={item.isCustomTile ? "/custom" : `/shop?cat=${item.slug}`}
               className="flex-shrink-0 w-1/2 sm:w-1/3 lg:w-1/4 snap-start"
               key={item.id}
             >
               <div className="relative bg-[var(--m-blush)] w-full h-56 sm:h-64 md:h-72 overflow-hidden rounded-lg">
-                {item.displayImage && (
-                  <Image
-                    src={item.displayImage}
-                    alt={item.displayName ?? ""}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover"
-                  />
+                {item.isCustomTile ? (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--m-blush)] to-[var(--m-gold)]/40 flex flex-col items-center justify-center gap-3">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                      <path d="M6 6L26 26M26 6L6 26" stroke="var(--m-earth)" strokeWidth="1.5" strokeLinecap="round" />
+                      <circle cx="8" cy="24" r="3" stroke="var(--m-earth)" strokeWidth="1.5" />
+                      <circle cx="24" cy="24" r="3" stroke="var(--m-earth)" strokeWidth="1.5" />
+                    </svg>
+                  </div>
+                ) : (
+                  item.displayImage && (
+                    <Image
+                      src={item.displayImage}
+                      alt={item.displayName ?? ""}
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="object-cover"
+                    />
+                  )
                 )}
               </div>
               <h1 className="mt-4 z-label-1 tracking-wide border-b border-[var(--m-black)] pb-2 block w-full">

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Menu from "./Menu";
@@ -8,6 +9,7 @@ import NavIcons from "./NavIcons";
 import MobileInlineSearch from "./MobileInlineSearch";
 import SearchBar from "./SearchBar";
 import CurrencySwitcher from "./CurrencySwitcher";
+import HairMenu from "./HairMenu";
 import type { Category } from "@/lib/categories";
 
 // Routes with a full-bleed dark hero directly under the navbar —
@@ -45,10 +47,15 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
 
         {/* MOBILE */}
         <div className="md:hidden h-full grid grid-cols-3 items-center gap-2">
-          <Link href="/">
-            <span className={`font-display text-base leading-none tracking-widest truncate transition-colors duration-300 ${linkColor}`}>
-              MIERA
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="Miera"
+              width={943}
+              height={499}
+              priority
+              className={`h-7 w-auto transition-[filter] duration-300 ${overDarkHero ? "brightness-0 invert" : ""}`}
+            />
           </Link>
           <div className="min-w-0 flex justify-center">
             <MobileInlineSearch />
@@ -64,26 +71,30 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
         <div className="hidden md:flex items-center justify-between h-full">
           {/* LEFT: brand + nav links */}
           <div className="flex items-center gap-10">
-            <Link href="/">
-              <span className={`font-display text-xl lg:text-2xl leading-none tracking-widest transition-colors duration-300 ${linkColor}`}>
-                MIERA
-              </span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.png"
+                alt="Miera"
+                width={943}
+                height={499}
+                priority
+                className={`h-9 lg:h-10 w-auto transition-[filter] duration-300 ${overDarkHero ? "brightness-0 invert" : ""}`}
+              />
             </Link>
-            <div className={`hidden xl:flex gap-6 m-title-sm transition-colors duration-300 ${linkColor}`}>
-              {[
-                { href: "/",       label: "Home" },
-                { href: "/shop",   label: "Shop"     },
-                { href: "/about",  label: "About"    },
-                { href: "/gallery",label: "Tutorials"},
-              ].map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="hover:text-[var(--m-gold)] transition-colors duration-200"
-                >
-                  {label}
-                </Link>
-              ))}
+            <div className={`hidden xl:flex items-center gap-6 m-title-sm transition-colors duration-300 ${linkColor}`}>
+              <Link href="/" className="hover:text-[var(--m-gold)] transition-colors duration-200">
+                Home
+              </Link>
+              <HairMenu categories={categories} light={overDarkHero} />
+              <Link href="/custom" className="hover:text-[var(--m-gold)] transition-colors duration-200">
+                Custom
+              </Link>
+              <Link href="/about" className="hover:text-[var(--m-gold)] transition-colors duration-200">
+                About
+              </Link>
+              <Link href="/gallery" className="hover:text-[var(--m-gold)] transition-colors duration-200">
+                Tutorials
+              </Link>
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCart } from "@/contexts/cart";
 
 type Variant = {
@@ -19,6 +19,9 @@ export default function Add(props: {
   imageUrl?: string;
   variants: Variant[];
   selectedVariantId: number; // <-- controlado pelo parent
+  priceCentsOverride?: number;
+  attributesOverride?: Record<string, string | number | undefined>;
+  onQtyChange?: (qty: number) => void;
 }) {
   const { productId, slug, name, imageUrl, variants, selectedVariantId } = props;
   const cart = useCart();
@@ -30,11 +33,17 @@ export default function Add(props: {
 
   const [quantity, setQuantity] = useState(1);
 
+  useEffect(() => {
+    props.onQtyChange?.(quantity);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quantity]);
+
   const stock = selectedVariant?.stock ?? 0;
   const isOutOfStock = stock < 1;
   const MAX_PREORDER_QTY = 10;
   const canDecrease = quantity > 1;
   const canIncrease = isOutOfStock ? quantity < MAX_PREORDER_QTY : quantity < stock;
+  const unitPriceCents = props.priceCentsOverride ?? selectedVariant?.priceCents ?? 0;
 
   function addToCart(e: React.MouseEvent) {
     e.preventDefault();
@@ -47,11 +56,12 @@ export default function Add(props: {
         variantId: selectedVariant.id,
         slug,
         name,
-        priceCents: selectedVariant.priceCents,
+        priceCents: unitPriceCents,
         imageUrl,
         attributes: {
           color: selectedVariant.color,
           size: selectedVariant.size,
+          ...(props.attributesOverride ?? {}),
           ...(isOutOfStock ? { preorder: "true" } : {}),
         },
       },

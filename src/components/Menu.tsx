@@ -4,12 +4,12 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Category } from "@/lib/categories";
-import { topLevelCategories } from "@/lib/categories";
 
 const Menu = ({ categories = [], light = false }: { categories?: Category[]; light?: boolean }) => {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const shopCategories = topLevelCategories(categories);
+  const hair = categories.find((c) => c.slug === "hair" && !c.parent_id);
+  const shopCategories = categories.filter((c) => c.parent_id === hair?.id);
 
   // Portal target isn't available until after mount (SSR safety)
   useEffect(() => {
@@ -63,6 +63,11 @@ const Menu = ({ categories = [], light = false }: { categories?: Category[]; lig
           <li>
             <Link href="/shop" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
               Shop
+            </Link>
+          </li>
+          <li>
+            <Link href="/custom" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
+              Custom
             </Link>
           </li>
           <li>

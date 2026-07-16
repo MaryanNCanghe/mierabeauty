@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { STANDARD_HAIR_COLORS, STANDARD_LENGTHS_IN, colorNameToSwatchClassName } from "@/lib/hairCustomization";
 
 export type VariantOption = {
   id: number;
@@ -17,6 +18,9 @@ type Props = {
   onChange: (variantId: number) => void;
   labels?: { color?: string; size?: string };
   colorToClassName?: (color?: string | null) => string;
+  /** Full standard option sets to render (with per-value availability), instead of only whatever values exist in `variants`. */
+  standardColors?: string[];
+  standardLengths?: string[];
 };
 
 /** Hair lengths are stored as a plain inch value (e.g. "18"); render both units. */
@@ -35,6 +39,8 @@ export default function CustomizeProducts({
   onChange,
   labels = { color: "Choose Color", size: "Choose Size" },
   colorToClassName,
+  standardColors = STANDARD_HAIR_COLORS.map((c) => c.name),
+  standardLengths = STANDARD_LENGTHS_IN.map(String),
 }: Props) {
   const norm = useMemo(() => {
     const colors = Array.from(new Set(
@@ -61,7 +67,7 @@ export default function CustomizeProducts({
       "chestnut brown": "bg-[#6B3E26]",
       burgundy: "bg-[#5C1A2E]",
     };
-    return map[color.toLowerCase()] ?? "bg-gray-300";
+    return colorNameToSwatchClassName(color) ?? map[color.toLowerCase()] ?? "bg-gray-300";
   };
 
   function chooseColor(color: string) {
@@ -84,26 +90,32 @@ export default function CustomizeProducts({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* COLOR — only rendered when this product actually has color variants */}
+      {/* COLOR — only rendered when this product actually has color variants at all;
+          shows the full standard palette, disabling any shade with no in-stock variant. */}
       {norm.colors.length > 0 && (
         <div>
           <h4 className="z-title-md mb-3">{labels.color ?? "Choose Color"}</h4>
-          <ul className="flex items-center gap-3">
-            {norm.colors.map(c => {
+          <ul className="flex items-center gap-3 flex-wrap">
+            {standardColors.map(c => {
               const active = norm.activeColor?.toLowerCase() === c.toLowerCase();
+              const inStock = variants.some(
+                v => (v.color ?? "").trim().toLowerCase() === c.toLowerCase() && v.stock > 0
+              );
               return (
                 <li key={c} className="relative">
                   <button
                     type="button"
                     aria-label={`Color ${c}`}
                     aria-pressed={active}
+                    disabled={!inStock}
                     onClick={() => chooseColor(c)}
                     className={[
                       "w-8 h-8 rounded-full ring-1",
                       active ? "ring-[var(--m-gold)] ring-2" : "ring-gray-300",
+                      inStock ? "" : "opacity-30 cursor-not-allowed",
                       colorDotClass(c),
                     ].join(" ")}
-                    title={c}
+                    title={inStock ? c : `${c} (currently unavailable)`}
                   />
                 </li>
               );
@@ -112,25 +124,32 @@ export default function CustomizeProducts({
         </div>
       )}
 
-      {/* SIZE — only rendered when this product actually has size variants; shown as inches / cm */}
+      {/* SIZE — only rendered when this product actually has size variants at all;
+          shows the full standard length range, disabling any length with no in-stock variant. */}
       {norm.sizes.length > 0 && (
         <div>
           <h4 className="z-title-md mb-3">{labels.size ?? "Choose Size"}</h4>
           <ul className="flex items-center gap-3 flex-wrap">
-            {norm.sizes.map(s => {
+            {standardLengths.map(s => {
               const active = norm.activeSize?.toLowerCase() === s.toLowerCase();
+              const inStock = variants.some(
+                v => (v.size ?? "").trim().toLowerCase() === s.toLowerCase() && v.stock > 0
+              );
               return (
                 <li key={s}>
                   <button
                     type="button"
                     onClick={() => chooseSize(s)}
                     aria-pressed={active}
+                    disabled={!inStock}
                     className={[
                       "rounded py-1.5 px-4 text-sm ring-1 transition-colors",
                       active
                         ? "ring-[var(--m-black)] bg-[var(--m-black)] text-white"
                         : "ring-gray-300 text-[var(--m-black)] hover:ring-[var(--m-black)]",
+                      inStock ? "" : "opacity-30 cursor-not-allowed hover:ring-gray-300",
                     ].join(" ")}
+                    title={inStock ? undefined : "Currently unavailable"}
                   >
                     {formatSize(s)}
                   </button>

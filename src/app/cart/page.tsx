@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/contexts/cart";
 import { useCurrency } from "@/contexts/currency";
+import { formatCartAttributesLine, computeGramsTotal } from "@/lib/hairCustomization";
 
 type CartItem = {
   productId: string;
@@ -16,6 +17,8 @@ type CartItem = {
     color?: string;
     size?: string;
     preorder?: string;
+    gramsMode?: string;
+    [key: string]: string | number | undefined;
   };
 };
 
@@ -118,14 +121,17 @@ export default function CartPage() {
                       </div>
                     </div>
 
-                    {it.attributes &&
-                      (it.attributes.color || it.attributes.size) && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          {[it.attributes.color, it.attributes.size]
-                            .filter(Boolean)
-                            .join(" / ")}
-                        </div>
-                      )}
+                    {it.attributes && formatCartAttributesLine(it.attributes) && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {formatCartAttributesLine(it.attributes)}
+                      </div>
+                    )}
+
+                    {it.attributes?.gramsMode && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {computeGramsTotal(it.qty)}g total
+                      </div>
+                    )}
 
                     {it.attributes?.preorder ? (
                       <div className="text-xs text-[var(--m-gold)] mt-1">
