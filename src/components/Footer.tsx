@@ -1,36 +1,38 @@
 import Image from "next/image";
 import Link from "next/link";
+import CrownIcon from "./CrownIcon";
 
 const Footer = () => {
   return (
-    <div className="py-24 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 bg-[var(--m-blush)] text-[var(--m-black)] text-sm mt-24">
+    <div className="py-24 px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 bg-[var(--m-black)] text-[var(--m-white)] text-sm mt-24">
       {/* TOP */}
       <div className="flex flex-col md:flex-row justify-between gap-24">
         {/* LEFT */}
         <div className="w-full md:w-1/2 lg:w-1/4 flex flex-col gap-8">
-          <Link href="/">
-            <Image src="/logo.png" alt="Miera" width={943} height={499} className="h-14 w-auto" priority={false} />
+          <Link href="/" className="flex flex-col items-start leading-none gap-1.5">
+            <CrownIcon size={24} />
+            <span className="font-display text-2xl tracking-widest text-[var(--m-white)]">MIERA</span>
           </Link>
-          <p className="m-label text-[var(--m-black)] font-medium">
+          <p className="m-label text-[var(--m-white)] font-medium">
             Crafted for the radiant.<br />Made for every girl.
           </p>
-          <a href="mailto:hello@mierabeauty.com" className="m-title-sm font-bold text-[var(--m-black)] hover:text-[var(--m-gold)] hover:underline transition-colors">hello@mierabeauty.com</a>
+          <a href="mailto:hello@mierabeauty.com" className="m-title-sm font-bold text-[var(--m-white)] hover:text-[var(--m-gold)] hover:underline transition-colors">hello@mierabeauty.com</a>
           <div className="flex gap-6">
             <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <Image src="/instagram.png" alt="Instagram" width={16} height={16} className="opacity-70 hover:opacity-100 transition-opacity" />
+              <Image src="/instagram.png" alt="Instagram" width={16} height={16} className="brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
             </a>
             <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-              <Image src="/youtube.png" alt="YouTube" width={16} height={16} className="opacity-70 hover:opacity-100 transition-opacity" />
+              <Image src="/youtube.png" alt="YouTube" width={16} height={16} className="brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
             </a>
             <a href="https://www.pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest">
-              <Image src="/pinterest.png" alt="Pinterest" width={16} height={16} className="opacity-70 hover:opacity-100 transition-opacity" />
+              <Image src="/pinterest.png" alt="Pinterest" width={16} height={16} className="brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
             </a>
           </div>
           <div className="flex flex-row gap-6 m-label">
-            <Link href="/about" className="text-[var(--m-black)] font-medium hover:text-[var(--m-gold)] transition-colors border-b border-[var(--m-muted)] hover:border-[var(--m-gold)] pb-0.5">
+            <Link href="/about" className="text-[var(--m-white)] font-medium hover:text-[var(--m-gold)] transition-colors border-b border-white/30 hover:border-[var(--m-gold)] pb-0.5">
               Contact Us
             </Link>
-            <Link href="/policy" className="text-[var(--m-black)] font-medium hover:text-[var(--m-gold)] transition-colors border-b border-[var(--m-muted)] hover:border-[var(--m-gold)] pb-0.5">
+            <Link href="/policy" className="text-[var(--m-white)] font-medium hover:text-[var(--m-gold)] transition-colors border-b border-white/30 hover:border-[var(--m-gold)] pb-0.5">
               Legal &amp; Privacy
             </Link>
           </div>
@@ -38,25 +40,25 @@ const Footer = () => {
 
         {/* RIGHT */}
         <div className="w-full md:w-1/2 lg:w-1/4 flex flex-col gap-8 mx-auto">
-          <h2 className="m-title-md text-[var(--m-black)] tracking-widest">SUBSCRIBE</h2>
-          <p className="m-label text-[var(--m-black)] font-medium">
+          <h2 className="m-title-md text-[var(--m-white)] tracking-widest">SUBSCRIBE</h2>
+          <p className="m-label text-[var(--m-white)] font-medium">
             Be the first to discover new arrivals, rituals, and exclusive offers.
           </p>
           <div className="flex border border-[var(--m-gold)]/40 hover:border-[var(--m-gold)] transition-colors">
             <input
               type="email"
               placeholder="Your email address"
-              className="p-4 w-3/4 m-label bg-transparent text-[var(--m-black)] placeholder-[var(--m-black)]/60 outline-none"
+              className="p-4 w-3/4 m-label bg-[var(--m-white)] text-[var(--m-black)] placeholder-[var(--m-muted)] outline-none"
             />
-            <button type="button" className="w-1/4 m-btn bg-[var(--m-black)] text-[var(--m-white)] border-l border-[var(--m-gold)]/40">
+            <button type="button" className="m-btn !w-1/4 !bg-[var(--m-gold)] !text-[var(--m-black)] border-l border-[var(--m-gold)]/40">
               JOIN
             </button>
           </div>
-          <span className="m-title-sm text-[var(--m-black)] font-medium tracking-widest">Secure Payments</span>
+          <span className="m-title-sm text-[var(--m-white)] font-medium tracking-widest">Secure Payments</span>
           <div className="flex gap-4">
-            <Image src="/paypal.png" alt="PayPal" width={40} height={20} className="opacity-70" />
-            <Image src="/mastercard.png" alt="Mastercard" width={40} height={20} className="opacity-70" />
-            <Image src="/visa.png" alt="Visa" width={40} height={20} className="opacity-70" />
+            <Image src="/paypal.png" alt="PayPal" width={40} height={20} className="opacity-90" />
+            <Image src="/mastercard.png" alt="Mastercard" width={40} height={20} className="opacity-90" />
+            <Image src="/visa.png" alt="Visa" width={40} height={20} className="opacity-90" />
           </div>
         </div>
       </div>
@@ -66,15 +68,15 @@ const Footer = () => {
 
       {/* BOTTOM */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-8">
-        <div className="m-label text-[var(--m-black)] font-medium">© 2026 MIERA</div>
+        <div className="m-label text-[var(--m-white)] font-medium">© 2026 MIERA</div>
         <div className="flex flex-col gap-4 md:flex-row">
           <div>
-            <span className="m-label text-[var(--m-black)] font-medium mr-4">Language</span>
-            <span className="m-label text-[var(--m-black)]">ENG | English</span>
+            <span className="m-label text-[var(--m-white)] font-medium mr-4">Language</span>
+            <span className="m-label text-[var(--m-white)]/70">ENG | English</span>
           </div>
           <div>
-            <span className="m-label text-[var(--m-black)] font-medium mr-4">Currency</span>
-            <span className="m-label text-[var(--m-black)]">€ EUR</span>
+            <span className="m-label text-[var(--m-white)] font-medium mr-4">Currency</span>
+            <span className="m-label text-[var(--m-white)]/70">€ EUR</span>
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Menu from "./Menu";
@@ -10,6 +9,7 @@ import MobileInlineSearch from "./MobileInlineSearch";
 import SearchBar from "./SearchBar";
 import CurrencySwitcher from "./CurrencySwitcher";
 import HairMenu from "./HairMenu";
+import CrownIcon from "./CrownIcon";
 import type { Category } from "@/lib/categories";
 
 // Routes with a full-bleed dark hero directly under the navbar —
@@ -46,21 +46,17 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
       <div className="h-14 md:h-20 px-3 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
 
         {/* MOBILE */}
-        <div className="md:hidden h-full grid grid-cols-3 items-center gap-2">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/logo.png"
-              alt="Miera"
-              width={943}
-              height={499}
-              priority
-              className={`h-7 w-auto transition-[filter] duration-300 ${overDarkHero ? "brightness-0 invert" : ""}`}
-            />
+        <div className="md:hidden h-full flex items-center justify-between gap-2">
+          <Link href="/" className="flex-shrink-0 flex flex-col items-center leading-none gap-0.5">
+            <CrownIcon size={16} />
+            <span className={`font-display text-sm tracking-widest transition-colors duration-300 ${linkColor}`}>
+              MIERA
+            </span>
           </Link>
-          <div className="min-w-0 flex justify-center">
+          <div className="flex-1 min-w-0 flex justify-center px-1">
             <MobileInlineSearch />
           </div>
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex-shrink-0 flex items-center justify-end gap-3">
             <CurrencySwitcher light={overDarkHero} />
             <NavIcons light={overDarkHero} />
             <Menu categories={categories} light={overDarkHero} />
@@ -71,15 +67,11 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
         <div className="hidden md:flex items-center justify-between h-full">
           {/* LEFT: brand + nav links */}
           <div className="flex items-center gap-10">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/logo.png"
-                alt="Miera"
-                width={943}
-                height={499}
-                priority
-                className={`h-9 lg:h-10 w-auto transition-[filter] duration-300 ${overDarkHero ? "brightness-0 invert" : ""}`}
-              />
+            <Link href="/" className="flex flex-col items-center leading-none gap-1">
+              <CrownIcon size={22} />
+              <span className={`font-display text-lg lg:text-xl tracking-widest transition-colors duration-300 ${linkColor}`}>
+                MIERA
+              </span>
             </Link>
             <div className={`hidden xl:flex items-center gap-6 m-title-sm transition-colors duration-300 ${linkColor}`}>
               <Link href="/" className="hover:text-[var(--m-gold)] transition-colors duration-200">

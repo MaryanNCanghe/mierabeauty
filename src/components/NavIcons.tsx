@@ -74,8 +74,8 @@ function NavIcons({ light = false }: { light?: boolean }) {
           <Image
             src="/profile.png"
             alt="Profile"
-            width={22}
-            height={22}
+            width={26}
+            height={26}
             className={`cursor-pointer transition-[filter] duration-300 ${light ? "brightness-0 invert" : ""}`}
             onClick={() => setIsProfileOpen(prev => !prev)}
           />

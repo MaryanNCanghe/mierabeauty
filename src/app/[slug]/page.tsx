@@ -161,7 +161,7 @@ export default async function SinglePage({ params }: { params: { slug: string } 
             <div>
               <h4 className="m-title-sm mb-2 text-[var(--m-black)]">Shipping</h4>
               <p className="m-label text-[var(--m-muted)] leading-relaxed">
-                Dispatched within 24–48h. Free returns within 30 days.
+                Dispatched within 24–48h. Delivery expected within 6 to 10 days. Free returns within 30 days.
               </p>
             </div>
           </div>
