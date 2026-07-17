@@ -61,27 +61,28 @@ export default function AboutPage() {
           <div className="flex flex-col items-center gap-6 max-w-3xl animate-fadeInUp">
             <span className="m-label text-[var(--m-gold)]">Our Story</span>
             <h1 className="about-hero-title">
-              Beauty, Crafted for Every Girl.
+              Radiance Begins With Real Hair.
             </h1>
             <p className="text-white/70 text-base md:text-lg font-light leading-relaxed max-w-xl">
-              Miera Beauty was born from a deep love for beauty rituals, fine botanicals, and a timeless approach to radiance.
+              Miera was born from a devotion to real, ethically-sourced human hair — chosen for
+              women who refuse to compromise on quality.
             </p>
           </div>
         </div>
       </section>
 
       {/* BRAND VALUES */}
-      <section className="w-full px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-64 py-24 bg-[var(--m-white)]">
+      <section className="w-full px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-64 py-24 bg-[var(--m-graphite)]">
         <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-12">
           {[
-            { title: "Heritage", body: "Every formula draws inspiration from timeless beauty rituals passed down through generations." },
-            { title: "Purity", body: "We source only the finest natural ingredients — shea, marula, baobab — chosen for purity and quality." },
-            { title: "Luxury", body: "Crafted for those who believe that beauty is a ritual, not a routine. Every detail is intentional." },
+            { title: "Ethically Sourced", body: "Every bundle begins as real, single-donor human hair — traceable back to its origin, never synthetic, never blended." },
+            { title: "Cuticle-Intact", body: "Cuticles are kept fully intact and aligned in one direction, so hair moves naturally and resists tangling or shedding." },
+            { title: "Made to Last", body: "Cared for properly, our hair holds its colour, texture, and shine for years — an investment in lasting radiance." },
           ].map((v) => (
             <div key={v.title} className="flex flex-col gap-4">
               <span className="m-label text-[var(--m-gold)]">{v.title}</span>
               <hr className="m-divider" />
-              <p className="text-[var(--m-muted)] font-light leading-relaxed text-sm">{v.body}</p>
+              <p className="text-white/80 font-light leading-relaxed text-sm">{v.body}</p>
             </div>
           ))}
         </div>

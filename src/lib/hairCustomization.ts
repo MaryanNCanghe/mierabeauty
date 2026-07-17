@@ -112,6 +112,7 @@ export function computeCustomizedUnitPriceCents(args: {
 export type CustomProductTypeId =
   | "bundle"
   | "clip-in"
+  | "tape-in"
   | "ponytail"
   | "closure"
   | "frontal"
@@ -121,6 +122,7 @@ export type CustomProductTypeId =
 export const CUSTOM_PRODUCT_TYPES: { id: CustomProductTypeId; label: string; mode: CustomizerMode }[] = [
   { id: "bundle", label: "Bundle / Weft", mode: "grams" },
   { id: "clip-in", label: "Clip-Ins", mode: "grams" },
+  { id: "tape-in", label: "Tape-Ins", mode: "grams" },
   { id: "ponytail", label: "Ponytail", mode: "density" },
   { id: "closure", label: "Closure", mode: "density" },
   { id: "frontal", label: "Frontal", mode: "density" },
@@ -131,6 +133,7 @@ export const CUSTOM_PRODUCT_TYPES: { id: CustomProductTypeId; label: string; mod
 export const CUSTOM_BASE_PRICE_EUR_CENTS: Record<CustomProductTypeId, number> = {
   bundle: 15500, // ≈ avg of real Bundles & Weaves / Virgin Human Hair products
   "clip-in": 11500, // ≈ real Clip-In Volumizer Set price
+  "tape-in": 13500, // no real tape-in product yet; estimated between clip-ins and bundles
   ponytail: 8500, // ≈ real Drawstring Ponytail price
   closure: 9500, // ≈ real 5x5 HD Lace Closure price
   frontal: 14000, // no real frontal product yet; estimated above closure

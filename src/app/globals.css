@@ -16,6 +16,7 @@
   --m-blush:   #EDD9C8;
   --m-muted:   #6B6B6B;
   --m-subtle:  #A8A39D;
+  --m-graphite: #2B2A28;
 
   /* Typography */
   --font-family-display: var(--font-display), 'Cormorant Garamond', Georgia, serif;

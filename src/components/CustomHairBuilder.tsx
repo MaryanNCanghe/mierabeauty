@@ -59,6 +59,13 @@ function ProductTypeIcon({ id }: { id: CustomProductTypeId }) {
         <path d="M7 9 V17 M13 9 V17" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
       </svg>
     ),
+    "tape-in": (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <rect x="4" y="3" width="5" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.4" />
+        <rect x="11" y="3" width="5" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M6.5 6 V17 M13.5 6 V17" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+    ),
     ponytail: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
         <circle cx="10" cy="6" r="3" stroke="currentColor" strokeWidth="1.4" />

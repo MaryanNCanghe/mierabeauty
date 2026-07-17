@@ -375,6 +375,7 @@ from (values
   ('virgin-human-hair',   'Virgin Human Hair',       'hair'),
   ('clip-ins',            'Clip-Ins',                'hair'),
   ('ponytails',           'Ponytails',               'hair'),
+  ('tape-ins',            'Tape-Ins',                'hair'),
 
   ('foundation',          'Foundation',              'makeup'),
   ('concealer',           'Concealer',               'makeup'),
