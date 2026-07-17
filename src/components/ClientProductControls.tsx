@@ -2,15 +2,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import CustomizeProducts from "@/components/CustomizeProducts";
+import ColorSwatchButton from "@/components/ColorSwatchButton";
+import LengthSelect from "@/components/LengthSelect";
 import ProductTierSelectors from "@/components/ProductTierSelectors";
 import Add from "@/components/Add";
 import { useCurrency } from "@/contexts/currency";
 import {
   computeCustomizedUnitPriceCents,
   computeLengthSurchargeCents,
-  formatLengthLabel,
   STANDARD_LENGTHS_IN,
+  STANDARD_HAIR_COLORS,
   GRAMS_PER_UNIT,
   QUALITY_TIERS,
   DENSITY_TIERS,
@@ -39,13 +40,15 @@ export default function ClientProductControls({
   const [densityTierId, setDensityTierId] = useState<DensityTierId>("130");
   const [lengthIn, setLengthIn] = useState<number>(STANDARD_LENGTHS_IN[0]);
   const [grams, setGrams] = useState<number>(GRAMS_PER_UNIT);
+  const [colorName, setColorName] = useState<string>(STANDARD_HAIR_COLORS[0].name);
 
   const hasCustomizer = customizerMode !== "none";
   const isGramsMode = customizerMode === "grams";
 
-  // Length is now a flat formulaic surcharge, not tied to a specific DB
-  // variant — the base is the product's cheapest real variant price,
-  // treated as the anchor for the shortest standard length.
+  // Length is a flat formulaic surcharge, not tied to a specific DB variant —
+  // the base is the product's cheapest real variant price, treated as the
+  // anchor for the shortest standard length. Color is likewise a cosmetic
+  // attribute, always available regardless of real per-product color stock.
   const baseVariantPriceCents = useMemo(
     () => Math.min(...variants.map((v) => v.priceCents)),
     [variants]
@@ -76,27 +79,34 @@ export default function ClientProductControls({
 
   return (
     <>
-      <CustomizeProducts
-        variants={variants}
-        selectedVariantId={selectedVariantId}
-        onChange={setSelectedVariantId}
-      />
+      {/* Live price — reacts to every option below, replaces the old static headline price */}
+      <p className="font-display text-xl font-light text-[var(--m-black)]">
+        {format(hasCustomizer ? displayPriceCents : selectedVariant?.priceCents ?? 0)}
+      </p>
+
+      <div className="h-px bg-[var(--m-gold)]/20" />
+
+      {hasCustomizer && (
+        <div>
+          <h4 className="z-title-md mb-3">Choose Color</h4>
+          <ul className="flex items-center gap-3 flex-wrap">
+            {STANDARD_HAIR_COLORS.map((c) => (
+              <li key={c.name}>
+                <ColorSwatchButton
+                  name={c.name}
+                  active={colorName === c.name}
+                  onClick={() => setColorName(c.name)}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {hasCustomizer && (
         <div>
           <h4 className="z-title-md mb-3">Choose Length</h4>
-          <select
-            value={lengthIn}
-            onChange={(e) => setLengthIn(Number(e.target.value))}
-            className="w-full max-w-xs border border-gray-300 rounded py-2 px-3 text-sm bg-white"
-          >
-            {STANDARD_LENGTHS_IN.map((len) => (
-              <option key={len} value={len}>
-                {formatLengthLabel(len)}
-                {len > STANDARD_LENGTHS_IN[0] ? ` (+${format(computeLengthSurchargeCents(len))})` : ""}
-              </option>
-            ))}
-          </select>
+          <LengthSelect value={lengthIn} onChange={setLengthIn} />
         </div>
       )}
 
@@ -125,6 +135,7 @@ export default function ClientProductControls({
         attributesOverride={
           hasCustomizer
             ? {
+                color: colorName,
                 size: String(lengthIn),
                 qualityTier: QUALITY_TIERS.find((t) => t.id === qualityTierId)!.label,
                 ...(customizerMode === "density"
@@ -134,10 +145,6 @@ export default function ClientProductControls({
             : undefined
         }
       />
-
-      <div className="z-label text-gray-600">
-        Price: {format(hasCustomizer ? displayPriceCents : selectedVariant?.priceCents ?? 0)}
-      </div>
     </>
   );
 }

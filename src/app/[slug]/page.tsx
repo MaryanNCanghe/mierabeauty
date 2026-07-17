@@ -5,7 +5,6 @@ import { supabaseServer } from '@/lib/supabase/server';
 import ProductImages, { ProductImageItem } from '@/components/ProductImages';
 import ClientProductControls from '@/components/ClientProductControls';
 import ProductListSupabase from '@/components/ProductList';
-import PriceTag from '@/components/PriceTag';
 import { customizerModeForCategorySlug } from '@/lib/hairCustomization';
 
 // Monta URL pública do Storage se vier apenas caminho; mantém URLs absolutas (http...)
@@ -86,10 +85,6 @@ export default async function SinglePage({ params }: { params: { slug: string } 
       priceCents: v.price_cents ?? product.price_cents,
     })) ?? [];
 
-  const leadingPriceCents =
-    variantItems.length > 0
-      ? Math.min(...variantItems.map((v) => v.priceCents))
-      : product.price_cents;
 
   return (
     <>
@@ -123,14 +118,8 @@ export default async function SinglePage({ params }: { params: { slug: string } 
             <p className="m-label text-[var(--m-subtle)]">No description available.</p>
           )}
 
-          <div className="h-px bg-[var(--m-gold)]/20" />
-
-          {/* Price */}
-          <p className="font-display text-xl font-light text-[var(--m-black)]">
-            <PriceTag eurCents={leadingPriceCents} />
-          </p>
-
-          <div className="h-px bg-[var(--m-gold)]/20" />
+          {/* Price now rendered inside ClientProductControls — it reacts live
+              to color/length/quality/density/grams instead of being fixed. */}
 
           {/* Variant selector + add to cart */}
           <ClientProductControls
@@ -155,7 +144,10 @@ export default async function SinglePage({ params }: { params: { slug: string } 
             <div>
               <h4 className="m-title-sm mb-2 text-[var(--m-black)]">Ingredients</h4>
               <p className="m-label text-[var(--m-muted)] leading-relaxed">
-                Natural &amp; ethically sourced ingredients. Dermatologist tested. Cruelty-free.
+                100% Real, Raw Virgin Human Hair — ethically sourced from a single donor, cuticles kept
+                fully intact and aligned in one direction for natural movement with no shedding or
+                tangling. Unprocessed and chemical-free, so it can be washed, styled, and coloured just
+                like your own hair. Dermatologically tested. Cruelty-free.
               </p>
             </div>
             <div>

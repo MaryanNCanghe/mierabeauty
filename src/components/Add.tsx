@@ -76,34 +76,61 @@ export default function Add(props: {
     );
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      {!hasQtyOverride && <h4 className="z-title-md">Quantity</h4>}
-      <div className="flex justify-between">
+  const addToCartButton = (
+    <button
+      type="button"
+      onClick={addToCart}
+      disabled={quantity < 1}
+      className="w-36 z-label-1 z-btn--primary disabled:cursor-not-allowed disabled:bg-grey-200 disabled:ring-0 disabled:text-white"
+    >
+      {isOutOfStock ? "Pre-Order" : "Add to Cart"}
+    </button>
+  );
+
+  if (hasQtyOverride) {
+    // No internal stepper here — quantity is already controlled elsewhere
+    // (e.g. a grams input) — keep the button in its normal compact spot
+    // instead of stretching it across an otherwise-empty row.
+    return (
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          {!hasQtyOverride && (
-            <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32">
-              <button
-                type="button"
-                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
-                onClick={() => canDecrease && setQuantity((p) => p - 1)}
-                disabled={!canDecrease}
-                aria-label="Decrease quantity"
-              >
-                -
-              </button>
-              {quantity}
-              <button
-                type="button"
-                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
-                onClick={() => canIncrease && setQuantity((p) => p + 1)}
-                disabled={!canIncrease}
-                aria-label="Increase quantity"
-              >
-                +
-              </button>
+          {isOutOfStock && (
+            <div className="text-xs text-[var(--m-muted)]">
+              Currently sold out — pre-order takes longer to arrive
             </div>
           )}
+          {addToCartButton}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h4 className="z-title-md">Quantity</h4>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-4">
+          <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32">
+            <button
+              type="button"
+              className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+              onClick={() => canDecrease && setQuantity((p) => p - 1)}
+              disabled={!canDecrease}
+              aria-label="Decrease quantity"
+            >
+              -
+            </button>
+            {quantity}
+            <button
+              type="button"
+              className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+              onClick={() => canIncrease && setQuantity((p) => p + 1)}
+              disabled={!canIncrease}
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
 
           {isOutOfStock && (
             <div className="text-xs text-[var(--m-muted)]">
@@ -112,14 +139,7 @@ export default function Add(props: {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={addToCart}
-          disabled={quantity < 1}
-          className="w-36 z-label-1 z-btn--primary disabled:cursor-not-allowed disabled:bg-grey-200 disabled:ring-0 disabled:text-white"
-        >
-          {isOutOfStock ? "Pre-Order" : "Add to Cart"}
-        </button>
+        {addToCartButton}
       </div>
     </div>
   );

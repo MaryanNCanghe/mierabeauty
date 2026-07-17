@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/contexts/cart";
 import { useCurrency } from "@/contexts/currency";
 import ColorSwatchButton from "@/components/ColorSwatchButton";
+import LengthSelect from "@/components/LengthSelect";
 import ProductTierSelectors from "@/components/ProductTierSelectors";
 import {
   STANDARD_HAIR_COLORS,
@@ -237,18 +238,7 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
         {/* Length */}
         <div>
           <h4 className="z-title-md mb-3">Length</h4>
-          <select
-            value={lengthIn}
-            onChange={(e) => setLengthIn(Number(e.target.value))}
-            className="w-full max-w-xs border border-gray-300 rounded py-2 px-3 text-sm bg-white"
-          >
-            {STANDARD_LENGTHS_IN.map((len) => (
-              <option key={len} value={len}>
-                {formatLengthLabel(len)}
-                {len > STANDARD_LENGTHS_IN[0] ? ` (+${format(computeLengthSurchargeCents(len))})` : ""}
-              </option>
-            ))}
-          </select>
+          <LengthSelect value={lengthIn} onChange={setLengthIn} />
         </div>
 
         {/* Quality tier + density/grams */}
