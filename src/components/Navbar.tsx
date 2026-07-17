@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Menu from "./Menu";
@@ -9,7 +10,6 @@ import MobileInlineSearch from "./MobileInlineSearch";
 import SearchBar from "./SearchBar";
 import CurrencySwitcher from "./CurrencySwitcher";
 import HairMenu from "./HairMenu";
-import CrownIcon from "./CrownIcon";
 import type { Category } from "@/lib/categories";
 
 // Routes with a full-bleed dark hero directly under the navbar —
@@ -48,7 +48,7 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
         {/* MOBILE */}
         <div className="md:hidden h-full flex items-center justify-between gap-2">
           <Link href="/" className="flex-shrink-0 flex flex-col items-center leading-none gap-0.5">
-            <CrownIcon size={16} />
+            <Image src="/crown.png" alt="" width={193} height={128} className="h-3.5 w-auto" priority />
             <span className={`font-display text-sm tracking-widest transition-colors duration-300 ${linkColor}`}>
               MIERA
             </span>
@@ -68,7 +68,7 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
           {/* LEFT: brand + nav links */}
           <div className="flex items-center gap-10">
             <Link href="/" className="flex flex-col items-center leading-none gap-1">
-              <CrownIcon size={22} />
+              <Image src="/crown.png" alt="" width={193} height={128} className="h-5 w-auto" priority />
               <span className={`font-display text-lg lg:text-xl tracking-widest transition-colors duration-300 ${linkColor}`}>
                 MIERA
               </span>

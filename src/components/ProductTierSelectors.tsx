@@ -3,7 +3,8 @@
 import {
   QUALITY_TIERS,
   DENSITY_TIERS,
-  computeGramsTotal,
+  GRAMS_PER_UNIT,
+  roundToNearestGramUnit,
   type QualityTierId,
   type DensityTierId,
 } from "@/lib/hairCustomization";
@@ -20,16 +21,22 @@ export default function ProductTierSelectors({
   onQualityTierChange,
   densityTierId,
   onDensityTierChange,
-  qty,
+  grams,
+  onGramsChange,
+  maxGrams,
 }: {
   mode: "grams" | "density";
   qualityTierId: QualityTierId;
   onQualityTierChange: (id: QualityTierId) => void;
   densityTierId: DensityTierId;
   onDensityTierChange: (id: DensityTierId) => void;
-  qty: number;
+  grams: number;
+  onGramsChange: (grams: number) => void;
+  maxGrams?: number;
 }) {
   const { format } = useCurrency();
+  const canDecreaseGrams = grams > GRAMS_PER_UNIT;
+  const canIncreaseGrams = maxGrams == null || grams < maxGrams;
 
   return (
     <div className="flex flex-col gap-6">
@@ -80,9 +87,41 @@ export default function ProductTierSelectors({
       )}
 
       {mode === "grams" && (
-        <p className="m-label text-[var(--m-muted)]">
-          Total weight: {computeGramsTotal(qty)}g
-        </p>
+        <div>
+          <h4 className="z-title-md mb-3">Grams</h4>
+          <div className="flex items-center gap-4">
+            <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center gap-3">
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => canDecreaseGrams && onGramsChange(grams - GRAMS_PER_UNIT)}
+                disabled={!canDecreaseGrams}
+                aria-label="Decrease grams"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                step={GRAMS_PER_UNIT}
+                min={GRAMS_PER_UNIT}
+                value={grams}
+                onChange={(e) => onGramsChange(roundToNearestGramUnit(Number(e.target.value) || GRAMS_PER_UNIT))}
+                className="w-16 bg-transparent text-center outline-none"
+                aria-label="Grams"
+              />
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => canIncreaseGrams && onGramsChange(grams + GRAMS_PER_UNIT)}
+                disabled={!canIncreaseGrams}
+                aria-label="Increase grams"
+              >
+                +
+              </button>
+            </div>
+            <span className="m-label text-[var(--m-muted)]">grams</span>
+          </div>
+        </div>
       )}
     </div>
   );

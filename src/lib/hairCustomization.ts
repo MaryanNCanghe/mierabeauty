@@ -25,6 +25,21 @@ export function formatLengthLabel(inches: number): string {
   return `${inches}" / ${Math.round(inches * 2.54)}cm`;
 }
 
+// ── Length pricing — flat, formulaic surcharge shared by every surface ──
+// Every standard length is always selectable (not gated by real per-length
+// stock); price scales by a flat amount per 2" step above the shortest
+// standard length, regardless of product or category.
+export const LENGTH_STEP_IN = 2;
+export const LENGTH_STEP_SURCHARGE_EUR_CENTS = 1500; // €15 per 2" step (given directly in EUR, flat across the whole site)
+
+export function computeLengthSurchargeCents(
+  lengthIn: number,
+  baseLengthIn: number = STANDARD_LENGTHS_IN[0]
+): number {
+  const steps = Math.round((lengthIn - baseLengthIn) / LENGTH_STEP_IN);
+  return Math.max(0, steps) * LENGTH_STEP_SURCHARGE_EUR_CENTS;
+}
+
 // ── Quality tier — new pricing-modifier dimension, always fully selectable ──
 export type QualityTierId = "standard" | "super_double_drawn" | "super_premium_double_drawn";
 export const QUALITY_TIERS: { id: QualityTierId; label: string; surchargeEurCents: number }[] = [
@@ -42,8 +57,18 @@ export const DENSITY_TIERS: { id: DensityTierId; label: string; percentLabel: st
   { id: "200", label: "Extra Heavy/Full", percentLabel: "200%+", surchargeEurCents: usdToEurCents(60) },
 ];
 
-// ── Grams ────────────────────────────────────────────────────────────
+// ── Grams — the actual unit of purchase for grams-mode products ────
+// The shopper picks a gram amount directly (in clean 100g steps); price
+// scales linearly with it, e.g. 200g = double the 100g price.
 export const GRAMS_PER_UNIT = 100;
+
+export function roundToNearestGramUnit(grams: number): number {
+  return Math.max(GRAMS_PER_UNIT, Math.round(grams / GRAMS_PER_UNIT) * GRAMS_PER_UNIT);
+}
+
+// Cart lines store `qty` as the number of GRAMS_PER_UNIT units purchased
+// (for grams-mode items, qty === grams / GRAMS_PER_UNIT) — this reconstructs
+// the gram total for display in the cart/checkout.
 export function computeGramsTotal(qty: number): number {
   return Math.max(0, qty) * GRAMS_PER_UNIT;
 }
@@ -59,14 +84,25 @@ export function customizerModeForCategorySlug(categorySlug: string | null | unde
 }
 
 // ── Price computation ───────────────────────────────────────────────
+// Returns the price for ONE GRAMS_PER_UNIT unit (e.g. one 100g bundle).
+// Grams scaling is deliberately NOT applied here — it's handled by the
+// cart's own qty mechanism (qty = grams / GRAMS_PER_UNIT), exactly like
+// any other quantity. Baking a grams multiplier in here too would double
+// it, since cart subtotal is already `priceCents * qty`.
 export function computeCustomizedUnitPriceCents(args: {
   baseVariantPriceCents: number;
+  lengthSurchargeCents?: number;
   qualityTierId?: QualityTierId | null;
   densityTierId?: DensityTierId | null;
 }): number {
   const quality = QUALITY_TIERS.find((t) => t.id === args.qualityTierId) ?? QUALITY_TIERS[0];
   const density = args.densityTierId ? DENSITY_TIERS.find((t) => t.id === args.densityTierId) : undefined;
-  return args.baseVariantPriceCents + quality.surchargeEurCents + (density?.surchargeEurCents ?? 0);
+  return (
+    args.baseVariantPriceCents +
+    (args.lengthSurchargeCents ?? 0) +
+    quality.surchargeEurCents +
+    (density?.surchargeEurCents ?? 0)
+  );
 }
 
 // ── /custom builder: product types + starting base prices ──────────
@@ -101,10 +137,6 @@ export const CUSTOM_BASE_PRICE_EUR_CENTS: Record<CustomProductTypeId, number> = 
   "wig-lace-front": 20000, // ≈ avg of real Lace Front Wig products
   "wig-full-lace": 25500, // ≈ avg of real Full Lace Wig products
 };
-
-// Blended average per-inch price delta across real bundle/wig variants —
-// applied per inch beyond the base (16") length in the /custom builder.
-export const CUSTOM_PRICE_PER_INCH_EUR_CENTS = 800;
 
 export type TextureId = "straight" | "body_wave" | "deep_wave" | "curly";
 export const TEXTURES: { id: TextureId; label: string }[] = [

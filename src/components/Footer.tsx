@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import CrownIcon from "./CrownIcon";
 
 const Footer = () => {
   return (
@@ -10,7 +9,7 @@ const Footer = () => {
         {/* LEFT */}
         <div className="w-full md:w-1/2 lg:w-1/4 flex flex-col gap-8">
           <Link href="/" className="flex flex-col items-start leading-none gap-1.5">
-            <CrownIcon size={24} />
+            <Image src="/crown.png" alt="" width={193} height={128} className="h-6 w-auto" />
             <span className="font-display text-2xl tracking-widest text-[var(--m-white)]">MIERA</span>
           </Link>
           <p className="m-label text-[var(--m-white)] font-medium">

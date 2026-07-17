@@ -8,6 +8,10 @@ import Add from "@/components/Add";
 import { useCurrency } from "@/contexts/currency";
 import {
   computeCustomizedUnitPriceCents,
+  computeLengthSurchargeCents,
+  formatLengthLabel,
+  STANDARD_LENGTHS_IN,
+  GRAMS_PER_UNIT,
   QUALITY_TIERS,
   DENSITY_TIERS,
   type QualityTierId,
@@ -33,19 +37,42 @@ export default function ClientProductControls({
 
   const [qualityTierId, setQualityTierId] = useState<QualityTierId>("standard");
   const [densityTierId, setDensityTierId] = useState<DensityTierId>("130");
-  const [qty, setQty] = useState(1);
+  const [lengthIn, setLengthIn] = useState<number>(STANDARD_LENGTHS_IN[0]);
+  const [grams, setGrams] = useState<number>(GRAMS_PER_UNIT);
 
   const hasCustomizer = customizerMode !== "none";
+  const isGramsMode = customizerMode === "grams";
 
+  // Length is now a flat formulaic surcharge, not tied to a specific DB
+  // variant — the base is the product's cheapest real variant price,
+  // treated as the anchor for the shortest standard length.
+  const baseVariantPriceCents = useMemo(
+    () => Math.min(...variants.map((v) => v.priceCents)),
+    [variants]
+  );
+
+  const stock = selectedVariant?.stock ?? 0;
+  const isOutOfStock = stock < 1;
+  const maxGrams = (isOutOfStock ? 10 : Math.max(1, stock)) * GRAMS_PER_UNIT;
+
+  // Per-GRAMS_PER_UNIT-unit price (e.g. price for one 100g bundle) — this is
+  // what actually gets charged per cart-quantity unit. Grams scaling is
+  // applied only for display below, via the cart's own qty mechanism
+  // (qtyOverride = grams / GRAMS_PER_UNIT), never baked in twice.
   const effectivePriceCents = useMemo(
     () =>
       computeCustomizedUnitPriceCents({
-        baseVariantPriceCents: selectedVariant?.priceCents ?? 0,
+        baseVariantPriceCents: hasCustomizer ? baseVariantPriceCents : selectedVariant?.priceCents ?? 0,
+        lengthSurchargeCents: hasCustomizer ? computeLengthSurchargeCents(lengthIn) : 0,
         qualityTierId: hasCustomizer ? qualityTierId : null,
         densityTierId: customizerMode === "density" ? densityTierId : null,
       }),
-    [selectedVariant, qualityTierId, densityTierId, customizerMode, hasCustomizer]
+    [hasCustomizer, baseVariantPriceCents, selectedVariant, lengthIn, qualityTierId, densityTierId, customizerMode]
   );
+
+  const displayPriceCents = isGramsMode
+    ? effectivePriceCents * (grams / GRAMS_PER_UNIT)
+    : effectivePriceCents;
 
   return (
     <>
@@ -56,13 +83,33 @@ export default function ClientProductControls({
       />
 
       {hasCustomizer && (
+        <div>
+          <h4 className="z-title-md mb-3">Choose Length</h4>
+          <select
+            value={lengthIn}
+            onChange={(e) => setLengthIn(Number(e.target.value))}
+            className="w-full max-w-xs border border-gray-300 rounded py-2 px-3 text-sm bg-white"
+          >
+            {STANDARD_LENGTHS_IN.map((len) => (
+              <option key={len} value={len}>
+                {formatLengthLabel(len)}
+                {len > STANDARD_LENGTHS_IN[0] ? ` (+${format(computeLengthSurchargeCents(len))})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {hasCustomizer && (
         <ProductTierSelectors
           mode={customizerMode === "density" ? "density" : "grams"}
           qualityTierId={qualityTierId}
           onQualityTierChange={setQualityTierId}
           densityTierId={densityTierId}
           onDensityTierChange={setDensityTierId}
-          qty={qty}
+          grams={grams}
+          onGramsChange={setGrams}
+          maxGrams={maxGrams}
         />
       )}
 
@@ -74,9 +121,11 @@ export default function ClientProductControls({
         variants={variants}
         selectedVariantId={selectedVariantId} // controlado
         priceCentsOverride={hasCustomizer ? effectivePriceCents : undefined}
+        qtyOverride={isGramsMode ? grams / GRAMS_PER_UNIT : undefined}
         attributesOverride={
           hasCustomizer
             ? {
+                size: String(lengthIn),
                 qualityTier: QUALITY_TIERS.find((t) => t.id === qualityTierId)!.label,
                 ...(customizerMode === "density"
                   ? { density: DENSITY_TIERS.find((t) => t.id === densityTierId)!.percentLabel }
@@ -84,11 +133,10 @@ export default function ClientProductControls({
               }
             : undefined
         }
-        onQtyChange={setQty}
       />
 
       <div className="z-label text-gray-600">
-        Price: {format(hasCustomizer ? effectivePriceCents : selectedVariant?.priceCents ?? 0)}
+        Price: {format(hasCustomizer ? displayPriceCents : selectedVariant?.priceCents ?? 0)}
       </div>
     </>
   );

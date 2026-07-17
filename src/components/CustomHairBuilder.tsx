@@ -11,12 +11,13 @@ import {
   STANDARD_LENGTHS_IN,
   CUSTOM_PRODUCT_TYPES,
   CUSTOM_BASE_PRICE_EUR_CENTS,
-  CUSTOM_PRICE_PER_INCH_EUR_CENTS,
   TEXTURES,
   QUALITY_TIERS,
   DENSITY_TIERS,
+  GRAMS_PER_UNIT,
   computeGramsTotal,
   computeCustomizedUnitPriceCents,
+  computeLengthSurchargeCents,
   formatLengthLabel,
   type CustomProductTypeId,
   type TextureId,
@@ -102,28 +103,30 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
   const [qualityTierId, setQualityTierId] = useState<QualityTierId>("standard");
   const [densityTierId, setDensityTierId] = useState<DensityTierId>("130");
   const [qty, setQty] = useState(1);
+  const [grams, setGrams] = useState(GRAMS_PER_UNIT);
 
   const productType = CUSTOM_PRODUCT_TYPES.find((t) => t.id === productTypeId)!;
   const mode = productType.mode === "density" ? "density" : "grams";
+  // For grams-mode product types, grams IS the quantity (grams / 100 units);
+  // density-mode types keep the plain 1-10 quantity stepper.
+  const effectiveQty = mode === "grams" ? grams / GRAMS_PER_UNIT : qty;
 
-  const basePriceCents = useMemo(
-    () =>
-      CUSTOM_BASE_PRICE_EUR_CENTS[productTypeId] +
-      (lengthIn - STANDARD_LENGTHS_IN[0]) * CUSTOM_PRICE_PER_INCH_EUR_CENTS,
-    [productTypeId, lengthIn]
-  );
+  const basePriceCents = CUSTOM_BASE_PRICE_EUR_CENTS[productTypeId];
 
+  // Per-GRAMS_PER_UNIT-unit price — grams scaling happens via effectiveQty
+  // (mirrors the cart's own qty × priceCents math), never baked in twice.
   const unitPriceCents = useMemo(
     () =>
       computeCustomizedUnitPriceCents({
         baseVariantPriceCents: basePriceCents,
+        lengthSurchargeCents: computeLengthSurchargeCents(lengthIn),
         qualityTierId,
         densityTierId: mode === "density" ? densityTierId : null,
       }),
-    [basePriceCents, qualityTierId, densityTierId, mode]
+    [basePriceCents, lengthIn, qualityTierId, densityTierId, mode]
   );
 
-  const totalPriceCents = unitPriceCents * qty;
+  const totalPriceCents = unitPriceCents * effectiveQty;
   const qualityTier = QUALITY_TIERS.find((t) => t.id === qualityTierId)!;
   const densityTier = DENSITY_TIERS.find((t) => t.id === densityTierId)!;
   const texture = TEXTURES.find((t) => t.id === textureId)!;
@@ -148,7 +151,7 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
           ...(mode === "density" ? { density: densityTier.percentLabel } : { gramsMode: "true" }),
         },
       },
-      qty
+      effectiveQty
     );
     router.push("/cart");
   }
@@ -234,26 +237,18 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
         {/* Length */}
         <div>
           <h4 className="z-title-md mb-3">Length</h4>
-          <ul className="flex items-center gap-3 flex-wrap">
-            {STANDARD_LENGTHS_IN.map((len) => {
-              const active = len === lengthIn;
-              return (
-                <li key={len}>
-                  <button
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => setLengthIn(len)}
-                    className={[
-                      "rounded py-1.5 px-4 text-sm ring-1 transition-colors",
-                      active ? PILL_ACTIVE : PILL_INACTIVE,
-                    ].join(" ")}
-                  >
-                    {formatLengthLabel(len)}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          <select
+            value={lengthIn}
+            onChange={(e) => setLengthIn(Number(e.target.value))}
+            className="w-full max-w-xs border border-gray-300 rounded py-2 px-3 text-sm bg-white"
+          >
+            {STANDARD_LENGTHS_IN.map((len) => (
+              <option key={len} value={len}>
+                {formatLengthLabel(len)}
+                {len > STANDARD_LENGTHS_IN[0] ? ` (+${format(computeLengthSurchargeCents(len))})` : ""}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Quality tier + density/grams */}
@@ -263,34 +258,38 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
           onQualityTierChange={setQualityTierId}
           densityTierId={densityTierId}
           onDensityTierChange={setDensityTierId}
-          qty={qty}
+          grams={grams}
+          onGramsChange={setGrams}
         />
 
-        {/* Quantity */}
-        <div>
-          <h4 className="z-title-md mb-3">Quantity</h4>
-          <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32">
-            <button
-              type="button"
-              className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
-              onClick={() => qty > 1 && setQty((q) => q - 1)}
-              disabled={qty <= 1}
-              aria-label="Decrease quantity"
-            >
-              -
-            </button>
-            {qty}
-            <button
-              type="button"
-              className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
-              onClick={() => qty < 10 && setQty((q) => q + 1)}
-              disabled={qty >= 10}
-              aria-label="Increase quantity"
-            >
-              +
-            </button>
+        {/* Quantity — only for density-mode types; grams-mode types use the
+            grams input above as their quantity instead. */}
+        {mode === "density" && (
+          <div>
+            <h4 className="z-title-md mb-3">Quantity</h4>
+            <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32">
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => qty > 1 && setQty((q) => q - 1)}
+                disabled={qty <= 1}
+                aria-label="Decrease quantity"
+              >
+                -
+              </button>
+              {qty}
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => qty < 10 && setQty((q) => q + 1)}
+                disabled={qty >= 10}
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Sticky price summary */}
@@ -301,6 +300,14 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
           <div className="flex justify-between z-label text-gray-600">
             <span>Base price</span>
             <span>{format(basePriceCents)}</span>
+          </div>
+          <div className="flex justify-between z-label text-gray-600">
+            <span>Length ({formatLengthLabel(lengthIn)})</span>
+            <span>
+              {computeLengthSurchargeCents(lengthIn) > 0
+                ? `+${format(computeLengthSurchargeCents(lengthIn))}`
+                : "Included"}
+            </span>
           </div>
           <div className="flex justify-between z-label text-gray-600">
             <span>Quality tier</span>
@@ -316,18 +323,18 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
           <div className="h-px bg-[var(--m-gold)]/20 my-1" />
 
           <div className="flex justify-between z-label-1">
-            <span>Unit price</span>
+            <span>Unit price {mode === "grams" ? `(per ${GRAMS_PER_UNIT}g)` : ""}</span>
             <span>{format(unitPriceCents)}</span>
           </div>
           <div className="flex justify-between z-label text-gray-600">
             <span>Quantity</span>
-            <span>× {qty}</span>
+            <span>× {effectiveQty}</span>
           </div>
 
           {mode === "grams" && (
             <div className="flex justify-between z-label text-gray-600">
               <span>Total weight</span>
-              <span>{computeGramsTotal(qty)}g</span>
+              <span>{computeGramsTotal(effectiveQty)}g</span>
             </div>
           )}
 

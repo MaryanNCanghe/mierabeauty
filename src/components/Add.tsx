@@ -22,6 +22,10 @@ export default function Add(props: {
   priceCentsOverride?: number;
   attributesOverride?: Record<string, string | number | undefined>;
   onQtyChange?: (qty: number) => void;
+  /** When set, quantity is fully owned by the parent (e.g. derived from a
+   * grams input) — the internal +/- stepper is hidden so there's only one
+   * quantity control on screen. */
+  qtyOverride?: number;
 }) {
   const { productId, slug, name, imageUrl, variants, selectedVariantId } = props;
   const cart = useCart();
@@ -31,12 +35,15 @@ export default function Add(props: {
     [variants, selectedVariantId]
   );
 
-  const [quantity, setQuantity] = useState(1);
+  const hasQtyOverride = props.qtyOverride != null;
+  const [internalQuantity, setQuantity] = useState(1);
+  const quantity = hasQtyOverride ? Math.max(1, props.qtyOverride!) : internalQuantity;
 
   useEffect(() => {
-    props.onQtyChange?.(quantity);
+    if (hasQtyOverride) return;
+    props.onQtyChange?.(internalQuantity);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quantity]);
+  }, [internalQuantity, hasQtyOverride]);
 
   const stock = selectedVariant?.stock ?? 0;
   const isOutOfStock = stock < 1;
@@ -71,30 +78,32 @@ export default function Add(props: {
 
   return (
     <div className="flex flex-col gap-4">
-      <h4 className="z-title-md">Quantity</h4>
+      {!hasQtyOverride && <h4 className="z-title-md">Quantity</h4>}
       <div className="flex justify-between">
         <div className="flex items-center gap-4">
-          <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32">
-            <button
-              type="button"
-              className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
-              onClick={() => canDecrease && setQuantity((p) => p - 1)}
-              disabled={!canDecrease}
-              aria-label="Decrease quantity"
-            >
-              -
-            </button>
-            {quantity}
-            <button
-              type="button"
-              className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
-              onClick={() => canIncrease && setQuantity((p) => p + 1)}
-              disabled={!canIncrease}
-              aria-label="Increase quantity"
-            >
-              +
-            </button>
-          </div>
+          {!hasQtyOverride && (
+            <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32">
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => canDecrease && setQuantity((p) => p - 1)}
+                disabled={!canDecrease}
+                aria-label="Decrease quantity"
+              >
+                -
+              </button>
+              {quantity}
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => canIncrease && setQuantity((p) => p + 1)}
+                disabled={!canIncrease}
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
+          )}
 
           {isOutOfStock && (
             <div className="text-xs text-[var(--m-muted)]">
