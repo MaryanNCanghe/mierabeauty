@@ -117,9 +117,6 @@ export default function ClientProductControls({
           onQualityTierChange={setQualityTierId}
           densityTierId={densityTierId}
           onDensityTierChange={setDensityTierId}
-          grams={grams}
-          onGramsChange={setGrams}
-          maxGrams={maxGrams}
         />
       )}
 
@@ -131,7 +128,10 @@ export default function ClientProductControls({
         variants={variants}
         selectedVariantId={selectedVariantId} // controlado
         priceCentsOverride={hasCustomizer ? effectivePriceCents : undefined}
-        qtyOverride={isGramsMode ? grams / GRAMS_PER_UNIT : undefined}
+        gramsMode={isGramsMode}
+        grams={grams}
+        onGramsChange={setGrams}
+        maxGrams={maxGrams}
         attributesOverride={
           hasCustomizer
             ? {

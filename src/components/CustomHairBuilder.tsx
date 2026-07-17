@@ -16,6 +16,7 @@ import {
   QUALITY_TIERS,
   DENSITY_TIERS,
   GRAMS_PER_UNIT,
+  roundToNearestGramUnit,
   computeGramsTotal,
   computeCustomizedUnitPriceCents,
   computeLengthSurchargeCents,
@@ -241,20 +242,17 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
           <LengthSelect value={lengthIn} onChange={setLengthIn} />
         </div>
 
-        {/* Quality tier + density/grams */}
+        {/* Quality tier + density */}
         <ProductTierSelectors
           mode={mode}
           qualityTierId={qualityTierId}
           onQualityTierChange={setQualityTierId}
           densityTierId={densityTierId}
           onDensityTierChange={setDensityTierId}
-          grams={grams}
-          onGramsChange={setGrams}
         />
 
-        {/* Quantity — only for density-mode types; grams-mode types use the
-            grams input above as their quantity instead. */}
-        {mode === "density" && (
+        {/* Quantity (density-mode types) or Grams (grams-mode types) */}
+        {mode === "density" ? (
           <div>
             <h4 className="z-title-md mb-3">Quantity</h4>
             <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center justify-between w-32">
@@ -274,6 +272,38 @@ export default function CustomHairBuilder({ placeholderProductId }: { placeholde
                 onClick={() => qty < 10 && setQty((q) => q + 1)}
                 disabled={qty >= 10}
                 aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h4 className="z-title-md mb-3">Grams</h4>
+            <div className="bg-gray-100 py-2 px-4 rounded-3xl flex items-center gap-3 w-fit">
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => grams > GRAMS_PER_UNIT && setGrams((g) => g - GRAMS_PER_UNIT)}
+                disabled={grams <= GRAMS_PER_UNIT}
+                aria-label="Decrease grams"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                step={GRAMS_PER_UNIT}
+                min={GRAMS_PER_UNIT}
+                value={grams}
+                onChange={(e) => setGrams(roundToNearestGramUnit(Number(e.target.value) || GRAMS_PER_UNIT))}
+                className="w-16 bg-transparent text-center outline-none"
+                aria-label="Grams"
+              />
+              <button
+                type="button"
+                className="cursor-pointer text-xl disabled:cursor-not-allowed disabled:opacity-20"
+                onClick={() => setGrams((g) => g + GRAMS_PER_UNIT)}
+                aria-label="Increase grams"
               >
                 +
               </button>

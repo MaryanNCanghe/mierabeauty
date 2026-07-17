@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="flex flex-col md:flex-row justify-between gap-24">
         {/* LEFT */}
         <div className="w-full md:w-1/2 lg:w-1/4 flex flex-col gap-8">
-          <Link href="/" className="flex flex-col items-start leading-none gap-1.5">
+          <Link href="/" className="flex flex-col items-center md:items-start leading-none gap-1.5 mx-auto md:mx-0">
             <Image src="/crown.png" alt="" width={193} height={128} className="h-6 w-auto" />
             <span className="font-display text-2xl tracking-widest text-[var(--m-white)]">MIERA</span>
           </Link>
