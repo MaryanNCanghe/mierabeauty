@@ -2,6 +2,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import ColorSwatchButton from "@/components/ColorSwatchButton";
 import LengthSelect from "@/components/LengthSelect";
 import ProductTierSelectors from "@/components/ProductTierSelectors";
@@ -24,11 +25,19 @@ export default function ClientProductControls({
   product,
   variants,
   customizerMode = "none",
+  colorSiblings,
+  currentColorName,
 }: {
   product: { id: number; slug: string; name: string; imageUrl?: string };
   variants: { id: number; color?: string; size?: string; stock: number; priceCents: number }[];
   customizerMode?: CustomizerMode;
+  // Other products sharing this one's color_group_id (same style, different
+  // color) — when present, the color picker becomes a real navigable
+  // swatch switcher instead of the cosmetic STANDARD_HAIR_COLORS picker.
+  colorSiblings?: { slug: string; color_name: string; main_image_url: string | null }[];
+  currentColorName?: string;
 }) {
+  const router = useRouter();
   const [selectedVariantId, setSelectedVariantId] = useState<number>(variants[0]?.id);
   const selectedVariant = useMemo(
     () => variants.find((v) => v.id === selectedVariantId) ?? variants[0],
@@ -40,8 +49,11 @@ export default function ClientProductControls({
   const [densityTierId, setDensityTierId] = useState<DensityTierId>("130");
   const [lengthIn, setLengthIn] = useState<number>(STANDARD_LENGTHS_IN[0]);
   const [grams, setGrams] = useState<number>(GRAMS_PER_UNIT);
-  const [colorName, setColorName] = useState<string>(STANDARD_HAIR_COLORS[0].name);
+  const [colorName, setColorName] = useState<string>(
+    currentColorName ?? STANDARD_HAIR_COLORS[0].name
+  );
 
+  const hasColorSiblings = !!colorSiblings?.length;
   const hasCustomizer = customizerMode !== "none";
   const isGramsMode = customizerMode === "grams";
 
@@ -86,7 +98,24 @@ export default function ClientProductControls({
 
       <div className="h-px bg-[var(--m-gold)]/20" />
 
-      {hasCustomizer && (
+      {hasCustomizer && hasColorSiblings && (
+        <div>
+          <h4 className="z-title-md mb-3">Choose Color</h4>
+          <ul className="flex items-center gap-3 flex-wrap">
+            {colorSiblings!.map((sib) => (
+              <li key={sib.slug}>
+                <ColorSwatchButton
+                  name={sib.color_name}
+                  active={colorName === sib.color_name}
+                  onClick={() => router.push(`/${sib.slug}`)}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {hasCustomizer && !hasColorSiblings && (
         <div>
           <h4 className="z-title-md mb-3">Choose Color</h4>
           <ul className="flex items-center gap-3 flex-wrap">

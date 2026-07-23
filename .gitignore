@@ -35,3 +35,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# one-off product-import artifacts — source photos are uploaded to Supabase
+# Storage by scripts/import-*.js, and manifests use machine-local absolute
+# paths, so neither belongs in the repo. Example manifests stay tracked.
+/public/straights/
+scripts/*-manifest.json

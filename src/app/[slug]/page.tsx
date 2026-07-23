@@ -22,12 +22,24 @@ export default async function SinglePage({ params }: { params: { slug: string } 
   // Produto
   const { data: product, error: prodErr } = await supabase
     .from('products')
-    .select('id, slug, name, description, price_cents, main_image_url')
+    .select('id, slug, name, description, price_cents, main_image_url, color_group_id, color_name')
     .eq('slug', slug)
     .maybeSingle();
 
   if (prodErr) throw new Error(`Failed to load product: ${prodErr.message}`);
   if (!product) notFound();
+
+  // Color siblings — other products sharing this one's color_group_id, i.e.
+  // the same style in a different color. Drives the swatch switcher below.
+  const { data: colorSiblings, error: siblingsErr } = product.color_group_id
+    ? await supabase
+        .from('products')
+        .select('slug, color_name, main_image_url')
+        .eq('color_group_id', product.color_group_id)
+        .order('color_name', { ascending: true })
+    : { data: null, error: null };
+
+  if (siblingsErr) console.warn('Failed to load color siblings:', siblingsErr.message);
 
   const { data: images, error: imgErr } = await supabase
     .from('product_images')
@@ -135,6 +147,8 @@ export default async function SinglePage({ params }: { params: { slug: string } 
                 : [{ id: product.id, priceCents: product.price_cents, stock: 9999 }]
             }
             customizerMode={customizerMode}
+            colorSiblings={colorSiblings ?? undefined}
+            currentColorName={product.color_name ?? undefined}
           />
 
           <div className="h-px bg-[var(--m-gold)]/20" />

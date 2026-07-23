@@ -1,0 +1,37 @@
+[
+  {
+    "colorName": "Natural Black",
+    "images": ["/absolute/path/to/folder/black-1.jpg"],
+    "priceCents": null
+  },
+  {
+    "colorName": "Dark Brown",
+    "images": ["/absolute/path/to/folder/dark-brown-1.jpg"],
+    "priceCents": null
+  },
+  {
+    "colorName": "Natural Brown",
+    "images": ["/absolute/path/to/folder/natural-brown-1.jpg"],
+    "priceCents": null
+  },
+  {
+    "colorName": "Caramel Brown",
+    "images": ["/absolute/path/to/folder/caramel-brown-1.jpg"],
+    "priceCents": null
+  },
+  {
+    "colorName": "Chestnut Brown",
+    "images": ["/absolute/path/to/folder/chestnut-brown-1.jpg"],
+    "priceCents": null
+  },
+  {
+    "colorName": "Blonde",
+    "images": ["/absolute/path/to/folder/blonde-1.jpg"],
+    "priceCents": null
+  },
+  {
+    "colorName": "Platinum Blonde",
+    "images": ["/absolute/path/to/folder/platinum-blonde-1.jpg"],
+    "priceCents": null
+  }
+]

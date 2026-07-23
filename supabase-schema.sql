@@ -43,6 +43,11 @@ create table if not exists products (
   updated_at     timestamptz not null default now()
 );
 
+-- Idempotent: color-sibling grouping — links products that are color
+-- variants of "the same" style so a swatch UI can switch between them.
+alter table products add column if not exists color_group_id uuid;
+alter table products add column if not exists color_name text;
+
 -- ── Product Images ───────────────────────────
 create table if not exists product_images (
   id          uuid    primary key default gen_random_uuid(),
@@ -319,6 +324,7 @@ create index if not exists idx_products_is_active   on products(is_active);
 create index if not exists idx_products_created_at  on products(created_at desc);
 create index if not exists idx_products_price       on products(price_cents);
 create index if not exists idx_products_name_trgm   on products using gin(name gin_trgm_ops);
+create index if not exists idx_products_color_group on products(color_group_id);
 
 -- product_images / variants
 create index if not exists idx_product_images_pid   on product_images(product_id);
@@ -368,11 +374,16 @@ from (values
   ('fragrance',           'Fragrance',               'beauty'),
   ('nail-care',           'Nail Care',               'beauty'),
 
+  ('straight',            'Straight',                'hair'),
+  ('natural-wave',        'Natural Wave',            'hair'),
+  ('water-wave',          'Water Wave',              'hair'),
+  ('loose-deep-curl',     'Loose Deep Curl',         'hair'),
+  ('deep-wave',           'Deep Wave',               'hair'),
+  ('body-wave',           'Body Wave',               'hair'),
+  ('kinky-curl',          'Kinky Curl',              'hair'),
   ('lace-front-wigs',     'Lace Front Wigs',         'hair'),
   ('full-lace-wigs',      'Full Lace Wigs',          'hair'),
-  ('bundles-weaves',      'Bundles & Weaves',        'hair'),
   ('closures-frontals',   'Closures & Frontals',     'hair'),
-  ('virgin-human-hair',   'Virgin Human Hair',       'hair'),
   ('clip-ins',            'Clip-Ins',                'hair'),
   ('ponytails',           'Ponytails',               'hair'),
   ('tape-ins',            'Tape-Ins',                'hair'),
@@ -389,6 +400,11 @@ from (values
 ) as v(slug, name, parent_slug)
 join categories p on p.slug = v.parent_slug
 on conflict (slug) do nothing;
+
+-- Retired: replaced by the texture categories above (straight, body-wave, etc).
+-- Any products still linked to these are recategorized by
+-- scripts/import-straight-hair.js; the cascade here just clears stale links.
+delete from categories where slug in ('bundles-weaves', 'virgin-human-hair');
 
 
 -- =============================================
@@ -429,3 +445,5 @@ create policy "public_read_product_images_storage"
 -- Storage : product-images bucket (public read, service_role write)
 -- Seed    : category taxonomy — Beauty, Hair, Makeup + subcategories
 --           (categories.parent_id)
+-- Columns : products.color_group_id / color_name — links products that are
+--           color variants of the same style for the swatch-switcher UI

@@ -8,21 +8,31 @@ import MobileScrollHintRight from "./MobileScrollHintRight";
 // Friendlier storefront labels for the Hair subcategories.
 // Anything not listed here just falls back to its DB name.
 const DISPLAY_NAME: Record<string, string> = {
-  "virgin-human-hair": "100% Virgin",
   "lace-front-wigs": "Front Lace",
-  "bundles-weaves": "Bundles",
   "clip-ins": "Clip-Ins",
 };
 
 // Subcategories hidden from the homepage catalogue only — they still
-// exist as filter options on the Shop page.
-const HIDDEN_ON_HOME = new Set(["closures-frontals", "hair-growth", "full-lace-wigs", "ponytails"]);
+// exist as filter options on the Shop page. natural-wave/water-wave/
+// loose-deep-curl are hidden here until they have real products/photos —
+// remove each from this set once its color lineup is imported.
+const HIDDEN_ON_HOME = new Set([
+  "closures-frontals",
+  "hair-growth",
+  "full-lace-wigs",
+  "ponytails",
+  "natural-wave",
+  "water-wave",
+  "loose-deep-curl",
+]);
 
 // Preferred display order; unlisted slugs are appended afterwards.
 const ORDER = [
-  "virgin-human-hair",
+  "straight",
   "lace-front-wigs",
-  "bundles-weaves",
+  "body-wave",
+  "deep-wave",
+  "kinky-curl",
   "clip-ins",
 ];
 
