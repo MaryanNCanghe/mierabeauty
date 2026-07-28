@@ -19,7 +19,7 @@ export default function ShopByColorPicker({ products }: { products: ColorProduct
   return (
     <div>
       <p className="m-label text-[var(--m-subtle)] mb-5">
-        Pick your natural shade — we'll show you the pieces that blend seamlessly.
+        Pick your natural shade — we&apos;ll show you the pieces that blend seamlessly.
       </p>
 
       <ul className="flex items-center gap-3 flex-wrap">
