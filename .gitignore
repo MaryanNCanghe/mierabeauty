@@ -37,7 +37,14 @@ yarn-error.log*
 next-env.d.ts
 
 # one-off product-import artifacts — source photos are uploaded to Supabase
-# Storage by scripts/import-*.js, and manifests use machine-local absolute
-# paths, so neither belongs in the repo. Example manifests stay tracked.
+# Storage by scripts/import-color-products.js, so the raw folders and their
+# manifests don't belong in the repo (manifests are consumed once and are
+# reproducible from the source folders + script).
 /public/straights/
+/public/miera-*/
+/public/straights-organized/
+/public/organized-hair-images-extra-girl-for-heros/
 scripts/*-manifest.json
+
+# public/factory images./ is NOT ignored — the /factory page serves those
+# files directly from disk (no Supabase Storage upload for that content).

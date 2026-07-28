@@ -53,7 +53,7 @@ export default async function SinglePage({ params }: { params: { slug: string } 
     .from('product_variants')
     .select('id, color, size, price_cents, stock')
     .eq('product_id', product.id)
-    .order('id', { ascending: true });
+    .order('size', { ascending: true });
 
   if (varErr) console.warn('Failed to load variants:', varErr.message);
 
@@ -65,9 +65,14 @@ export default async function SinglePage({ params }: { params: { slug: string } 
 
   if (catLinkErr) console.warn('Failed to load product categories:', catLinkErr.message);
 
-  const hairCategory = (catLinks ?? [])
-    .map((l: any) => l.categories)
-    .find((c: any) => c && c.parent_id != null);
+  // Bundle products carry two category links (their specific texture, e.g.
+  // "Straight", plus the "Bundles" umbrella) — prefer the more specific one
+  // for the breadcrumb/customizer-mode resolution, falling back to whichever
+  // link exists if "bundles" is the only one.
+  const linkedCategories = (catLinks ?? []).map((l: any) => l.categories).filter(Boolean);
+  const hairCategory =
+    linkedCategories.find((c: any) => c.parent_id != null && c.slug !== 'bundles') ??
+    linkedCategories.find((c: any) => c.parent_id != null);
 
   const categoryName: string = hairCategory?.name ?? 'Hair';
   const customizerMode = customizerModeForCategorySlug(hairCategory?.slug ?? null);
@@ -106,7 +111,7 @@ export default async function SinglePage({ params }: { params: { slug: string } 
         {/* Image column — sticky on desktop */}
         <div className="w-full lg:w-1/2 flex-shrink-0">
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <ProductImages items={imageItems} objectFit="cover" />
+            <ProductImages items={imageItems} />
           </div>
         </div>
 
@@ -117,7 +122,7 @@ export default async function SinglePage({ params }: { params: { slug: string } 
           <span className="m-label text-[var(--m-gold)]">{categoryName}</span>
 
           {/* Product title — Cormorant display */}
-          <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-light leading-tight text-[var(--m-black)]">
+          <h1 className="font-display text-xl md:text-2xl lg:text-3xl font-light leading-tight text-[var(--m-black)]">
             {product.name}
           </h1>
 

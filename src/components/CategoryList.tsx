@@ -5,36 +5,23 @@ import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 import MobileScrollHintRight from "./MobileScrollHintRight";
 
-// Friendlier storefront labels for the Hair subcategories.
+// Friendlier storefront labels for the homepage tiles specifically.
 // Anything not listed here just falls back to its DB name.
-const DISPLAY_NAME: Record<string, string> = {
-  "lace-front-wigs": "Front Lace",
-  "clip-ins": "Clip-Ins",
-};
+const DISPLAY_NAME: Record<string, string> = {};
 
-// Subcategories hidden from the homepage catalogue only — they still
-// exist as filter options on the Shop page. natural-wave/water-wave/
-// loose-deep-curl are hidden here until they have real products/photos —
-// remove each from this set once its color lineup is imported.
+// Homepage shows only the curated top-level set: Bundles, Clip-Ins, Custom
+// (synthetic tile below), Closures & Frontals, Ponytails. Everything else
+// still exists as a filter option on the Shop page.
 const HIDDEN_ON_HOME = new Set([
-  "closures-frontals",
-  "hair-growth",
+  "lace-front-wigs",
   "full-lace-wigs",
-  "ponytails",
-  "natural-wave",
-  "water-wave",
-  "loose-deep-curl",
+  "tape-ins",
+  "hair-growth",
 ]);
 
 // Preferred display order; unlisted slugs are appended afterwards.
-const ORDER = [
-  "straight",
-  "lace-front-wigs",
-  "body-wave",
-  "deep-wave",
-  "kinky-curl",
-  "clip-ins",
-];
+// "custom" is the synthetic Build-Your-Own tile, not a DB category.
+const ORDER = ["bundles", "clip-ins", "custom", "closures-frontals", "ponytails"];
 
 const CategoryList = async () => {
   const supabase = supabaseServer();
@@ -68,24 +55,15 @@ const CategoryList = async () => {
     }
   }
 
-  const cats = subCats
-    .map((c) => ({
-      ...c,
-      displayName: DISPLAY_NAME[c.slug] ?? c.name,
-      displayImage: c.image_url ?? fallbackImages[c.id] ?? null,
-      isCustomTile: false,
-    }))
-    .sort((a, b) => {
-      const ai = ORDER.indexOf(a.slug);
-      const bi = ORDER.indexOf(b.slug);
-      if (ai === -1 && bi === -1) return a.slug.localeCompare(b.slug);
-      if (ai === -1) return 1;
-      if (bi === -1) return -1;
-      return ai - bi;
-    });
+  const dbTiles = subCats.map((c) => ({
+    ...c,
+    displayName: DISPLAY_NAME[c.slug] ?? c.name,
+    displayImage: c.image_url ?? fallbackImages[c.id] ?? null,
+    isCustomTile: false,
+  }));
 
   // Synthetic tile — not a DB category, links to the build-your-own configurator.
-  cats.push({
+  const customTile = {
     id: -1,
     slug: "custom",
     name: "Build Your Own",
@@ -94,6 +72,15 @@ const CategoryList = async () => {
     displayName: "Build Your Own",
     displayImage: null,
     isCustomTile: true,
+  };
+
+  const cats = [...dbTiles, customTile].sort((a, b) => {
+    const ai = ORDER.indexOf(a.slug);
+    const bi = ORDER.indexOf(b.slug);
+    if (ai === -1 && bi === -1) return a.slug.localeCompare(b.slug);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
   });
 
   if (!cats?.length) return null;

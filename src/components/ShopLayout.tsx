@@ -8,19 +8,29 @@ import type { Category } from "@/lib/categories";
 export default function ShopLayout({
   categories,
   children,
+  shopByColor,
 }: {
   categories: Category[];
   children: React.ReactNode;
+  shopByColor?: React.ReactNode;
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
 
   return (
     <>
+      {/* ── Shop by Your Hair Color — top of page, above filters/grid ── */}
+      {shopByColor && (
+        <div className="mb-10 pb-10 border-b border-[var(--m-black)]/10">
+          <h2 className="m-section-title mb-6">Shop by Your Hair Color</h2>
+          {shopByColor}
+        </div>
+      )}
+
       {/* ── Page header ── */}
       <div className="mb-10 border-b border-[var(--m-black)]/10 pb-6 flex items-end justify-between">
         <div>
           <span className="m-label text-[var(--m-gold)]">Products</span>
-          <h1 className="font-display text-4xl md:text-5xl font-light mt-2 text-[var(--m-black)]">
+          <h1 className="font-display text-2xl md:text-3xl font-light mt-2 text-[var(--m-black)]">
             All Products
           </h1>
         </div>

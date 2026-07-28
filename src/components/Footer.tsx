@@ -9,7 +9,6 @@ const Footer = () => {
         {/* LEFT */}
         <div className="w-full md:w-1/2 lg:w-1/4 flex flex-col gap-8">
           <Link href="/" className="flex flex-col items-center md:items-start leading-none gap-1.5 mx-auto md:mx-0">
-            <Image src="/crown.png" alt="" width={193} height={128} className="h-6 w-auto" />
             <span className="font-display text-2xl tracking-widest text-[var(--m-white)]">MIERA</span>
           </Link>
           <p className="m-label text-[var(--m-white)] font-medium">
@@ -20,8 +19,16 @@ const Footer = () => {
             <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
               <Image src="/instagram.png" alt="Instagram" width={16} height={16} className="brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
             </a>
-            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-              <Image src="/youtube.png" alt="YouTube" width={16} height={16} className="brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />
+            <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                className="fill-white opacity-70 hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              >
+                <path d="M16.6 5.82c-1.02-.88-1.6-2.15-1.6-3.52h-3.02v13.44c0 1.64-1.34 2.98-2.98 2.98s-2.98-1.34-2.98-2.98 1.34-2.98 2.98-2.98c.3 0 .58.05.85.13v-3.07a6.1 6.1 0 0 0-.85-.06c-3.33 0-6.02 2.69-6.02 6.02s2.69 6 6.02 6 6.02-2.69 6.02-6.02V9.03a7.5 7.5 0 0 0 4.5 1.5V7.5c-1.05 0-2.02-.34-2.82-.92-.4-.24-.76-.53-1.1-.86z" />
+              </svg>
             </a>
             <a href="https://www.pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest">
               <Image src="/pinterest.png" alt="Pinterest" width={16} height={16} className="brightness-0 invert opacity-70 hover:opacity-100 transition-opacity" />

@@ -16,7 +16,7 @@ export type ProductCardData = {
 };
 
 export default function ProductCard({ product }: { product: ProductCardData }) {
-  const { slug, name, description, price_cents, images, isNew } = product;
+  const { slug, name, price_cents, images, isNew } = product;
   const [activeIdx, setActiveIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
   const { format } = useCurrency();
@@ -92,12 +92,6 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
           <h3 className="font-display text-base sm:text-xl font-light leading-snug text-[var(--m-black)]">
             {name}
           </h3>
-
-          {description && (
-            <p className="mt-1 sm:mt-1.5 text-[var(--m-muted)] text-xs font-light leading-relaxed line-clamp-1 sm:line-clamp-2">
-              {description}
-            </p>
-          )}
 
           <div className="mt-2 sm:mt-4 flex items-center justify-between">
             <span className="m-label text-[var(--m-muted)] text-[0.6rem] sm:text-xs">From {price}</span>

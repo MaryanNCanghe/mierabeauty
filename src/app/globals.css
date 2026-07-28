@@ -286,7 +286,7 @@ a[role="button"],
 /* Serif display section title */
 .m-section-title {
   font-family: var(--font-family-display);
-  font-size: var(--fs-3xl);
+  font-size: var(--fs-2xl);
   line-height: 1.1;
   font-weight: var(--fw-light);
   letter-spacing: var(--ls-tight);

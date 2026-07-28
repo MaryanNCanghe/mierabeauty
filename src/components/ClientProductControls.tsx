@@ -45,26 +45,48 @@ export default function ClientProductControls({
   );
   const { format } = useCurrency();
 
+  const hasColorSiblings = !!colorSiblings?.length;
+  const hasCustomizer = customizerMode !== "none";
+  const isGramsMode = customizerMode === "grams";
+
+  // Real lengths this product actually has variants for (e.g. from
+  // apply-price-catalogue.js) — grams-mode products (Bundles, Clip-Ins) are
+  // priced per real length/texture, not a flat formula. Density-mode
+  // products without per-length variants yet fall back to the flat
+  // STANDARD_LENGTHS_IN list further below.
+  const realLengths = useMemo(
+    () =>
+      Array.from(new Set(variants.map((v) => Number(v.size)).filter((n) => Number.isFinite(n)))).sort(
+        (a, b) => a - b
+      ),
+    [variants]
+  );
+  const hasRealLengths = isGramsMode && realLengths.length > 0;
+
   const [qualityTierId, setQualityTierId] = useState<QualityTierId>("standard");
   const [densityTierId, setDensityTierId] = useState<DensityTierId>("130");
-  const [lengthIn, setLengthIn] = useState<number>(STANDARD_LENGTHS_IN[0]);
+  const [lengthIn, setLengthIn] = useState<number>(() => realLengths[0] ?? STANDARD_LENGTHS_IN[0]);
   const [grams, setGrams] = useState<number>(GRAMS_PER_UNIT);
   const [colorName, setColorName] = useState<string>(
     currentColorName ?? STANDARD_HAIR_COLORS[0].name
   );
 
-  const hasColorSiblings = !!colorSiblings?.length;
-  const hasCustomizer = customizerMode !== "none";
-  const isGramsMode = customizerMode === "grams";
-
-  // Length is a flat formulaic surcharge, not tied to a specific DB variant —
-  // the base is the product's cheapest real variant price, treated as the
-  // anchor for the shortest standard length. Color is likewise a cosmetic
-  // attribute, always available regardless of real per-product color stock.
+  // Legacy flat-surcharge anchor — only used for density-mode products,
+  // which don't yet have real per-length variants.
   const baseVariantPriceCents = useMemo(
     () => Math.min(...variants.map((v) => v.priceCents)),
     [variants]
   );
+
+  // The real variant priced for the currently selected length (grams-mode
+  // only) — its price already reflects that exact length, so no separate
+  // surcharge is added on top.
+  const lengthVariantPriceCents = useMemo(() => {
+    const match = variants.find((v) => Number(v.size) === lengthIn);
+    return match?.priceCents ?? baseVariantPriceCents;
+  }, [variants, lengthIn, baseVariantPriceCents]);
+
+  const priceForLength = (len: number) => variants.find((v) => Number(v.size) === len)?.priceCents ?? 0;
 
   const stock = selectedVariant?.stock ?? 0;
   const isOutOfStock = stock < 1;
@@ -77,12 +99,26 @@ export default function ClientProductControls({
   const effectivePriceCents = useMemo(
     () =>
       computeCustomizedUnitPriceCents({
-        baseVariantPriceCents: hasCustomizer ? baseVariantPriceCents : selectedVariant?.priceCents ?? 0,
-        lengthSurchargeCents: hasCustomizer ? computeLengthSurchargeCents(lengthIn) : 0,
+        baseVariantPriceCents: !hasCustomizer
+          ? selectedVariant?.priceCents ?? 0
+          : hasRealLengths
+            ? lengthVariantPriceCents
+            : baseVariantPriceCents,
+        lengthSurchargeCents: hasCustomizer && !hasRealLengths ? computeLengthSurchargeCents(lengthIn) : 0,
         qualityTierId: hasCustomizer ? qualityTierId : null,
         densityTierId: customizerMode === "density" ? densityTierId : null,
       }),
-    [hasCustomizer, baseVariantPriceCents, selectedVariant, lengthIn, qualityTierId, densityTierId, customizerMode]
+    [
+      hasCustomizer,
+      hasRealLengths,
+      lengthVariantPriceCents,
+      baseVariantPriceCents,
+      selectedVariant,
+      lengthIn,
+      qualityTierId,
+      densityTierId,
+      customizerMode,
+    ]
   );
 
   const displayPriceCents = isGramsMode
@@ -102,15 +138,19 @@ export default function ClientProductControls({
         <div>
           <h4 className="z-title-md mb-3">Choose Color</h4>
           <ul className="flex items-center gap-3 flex-wrap">
-            {colorSiblings!.map((sib) => (
-              <li key={sib.slug}>
-                <ColorSwatchButton
-                  name={sib.color_name}
-                  active={colorName === sib.color_name}
-                  onClick={() => router.push(`/${sib.slug}`)}
-                />
-              </li>
-            ))}
+            {STANDARD_HAIR_COLORS.map((c) => {
+              const sib = colorSiblings!.find((s) => s.color_name === c.name);
+              return (
+                <li key={c.name}>
+                  <ColorSwatchButton
+                    name={c.name}
+                    active={colorName === c.name}
+                    disabled={!sib}
+                    onClick={() => sib && router.push(`/${sib.slug}`)}
+                  />
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -135,7 +175,12 @@ export default function ClientProductControls({
       {hasCustomizer && (
         <div>
           <h4 className="z-title-md mb-3">Choose Length</h4>
-          <LengthSelect value={lengthIn} onChange={setLengthIn} />
+          <LengthSelect
+            value={lengthIn}
+            onChange={setLengthIn}
+            lengths={hasRealLengths ? realLengths : undefined}
+            priceForLength={hasRealLengths ? priceForLength : undefined}
+          />
         </div>
       )}
 

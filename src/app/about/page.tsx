@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export default function AboutPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -46,13 +47,13 @@ export default function AboutPage() {
       {/* HERO: full-screen with brand story overlay */}
       <section className="relative h-screen w-full bg-[var(--m-black)]">
         <div className="absolute inset-0 flex items-center justify-center">
-          <video
-            src="https://cdn.coverr.co/videos/coverr-sunlight-through-leaves-3540/1080p.mp4"
-            className="w-full h-full object-cover opacity-50"
-            muted
-            autoPlay
-            loop
-            playsInline
+          <Image
+            src="https://epptibwjvogadqehnyua.supabase.co/storage/v1/object/public/product-images/decorative/chestnut-brown-natural-wave.png"
+            alt=""
+            fill
+            sizes="100vw"
+            priority
+            className="object-cover opacity-70"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/70" />
@@ -89,14 +90,14 @@ export default function AboutPage() {
       </section>
 
       {/* CONTACT FORM */}
-      <section className="w-full bg-[var(--m-blush)]" id="contact">
+      <section className="w-full bg-[var(--m-graphite)]" id="contact">
         <div className="mx-auto max-w-xl px-6 py-20">
           <div className="text-center mb-10">
             <span className="m-label text-[var(--m-gold)]">Get in touch</span>
-            <h2 className="font-display text-2xl md:text-3xl font-light mt-3 text-[var(--m-black)]">
+            <h2 className="font-display text-2xl md:text-3xl font-light mt-3 text-[var(--m-white)]">
               Contact Us
             </h2>
-            <p className="m-label text-[var(--m-muted)] mt-3">
+            <p className="m-label text-white/50 mt-3">
               For collaborations, press, or any enquiry — we&apos;d love to hear from you.
             </p>
           </div>
@@ -112,38 +113,38 @@ export default function AboutPage() {
             <input type="text" name="company" title="Leave this field empty" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
 
             <div>
-              <label htmlFor="name" className="m-label block mb-2 text-[var(--m-black)]">Name</label>
+              <label htmlFor="name" className="m-label block mb-2 text-white/70">Name</label>
               <input
                 id="name"
                 name="name"
                 type="text"
                 required
                 placeholder="Your name"
-                className="w-full border border-[var(--m-muted)]/40 bg-transparent px-4 py-3 text-[var(--m-black)] placeholder-[var(--m-subtle)] focus:border-[var(--m-gold)] focus:outline-none transition-colors"
+                className="w-full border border-white/20 bg-transparent px-4 py-3 text-[var(--m-white)] placeholder-white/30 focus:border-[var(--m-gold)] focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="m-label block mb-2 text-[var(--m-black)]">Email</label>
+              <label htmlFor="email" className="m-label block mb-2 text-white/70">Email</label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
                 placeholder="you@example.com"
-                className="w-full border border-[var(--m-muted)]/40 bg-transparent px-4 py-3 text-[var(--m-black)] placeholder-[var(--m-subtle)] focus:border-[var(--m-gold)] focus:outline-none transition-colors"
+                className="w-full border border-white/20 bg-transparent px-4 py-3 text-[var(--m-white)] placeholder-white/30 focus:border-[var(--m-gold)] focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label htmlFor="message" className="m-label block mb-2 text-[var(--m-black)]">Message</label>
+              <label htmlFor="message" className="m-label block mb-2 text-white/70">Message</label>
               <textarea
                 id="message"
                 name="message"
                 rows={5}
                 required
                 placeholder="Write your message…"
-                className="w-full border border-[var(--m-muted)]/40 bg-transparent px-4 py-3 text-[var(--m-black)] placeholder-[var(--m-subtle)] focus:border-[var(--m-gold)] focus:outline-none transition-colors resize-none"
+                className="w-full border border-white/20 bg-transparent px-4 py-3 text-[var(--m-white)] placeholder-white/30 focus:border-[var(--m-gold)] focus:outline-none transition-colors resize-none"
               />
             </div>
 
@@ -157,12 +158,12 @@ export default function AboutPage() {
             </button>
 
             {status === "success" && (
-              <p className="text-center m-label text-green-700">
+              <p className="text-center m-label text-green-400">
                 Message sent — we&apos;ll reply soon.
               </p>
             )}
             {status === "error" && (
-              <p className="text-center m-label text-red-600">
+              <p className="text-center m-label text-red-400">
                 Something went wrong. Please try again.
               </p>
             )}

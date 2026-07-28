@@ -75,6 +75,27 @@ create table if not exists product_categories (
   primary key (product_id, category_id)
 );
 
+-- ── Price Catalogue ───────────────────────────
+-- Editable factory-cost/retail reference (USD cents), independent of live
+-- product_variants — scripts/apply-price-catalogue.js reads this to seed
+-- and reprice real products. Edit rows here + re-run that script any time
+-- prices change.
+create table if not exists price_catalogue (
+  id                          bigint generated always as identity primary key,
+  product_type                text        not null, -- 'bundle' | 'clip_in_set' | 'lace_front_wig_13x4' |
+                                                      -- 'closure_5x5' | 'frontal_13x4' | 'frontal_13x6' |
+                                                      -- 'full_lace_wig' | 'u_v_part_wig' | 'ponytail'
+  length_in                   integer,               -- null for range/"any length" rows
+  texture                     text,                  -- 'straight' | 'wave_curly' | null
+  factory_cost_low_usd_cents  bigint,
+  factory_cost_high_usd_cents bigint,                -- = low when not a range
+  retail_low_usd_cents        bigint,
+  retail_high_usd_cents       bigint,                -- = low when not a range
+  status                      text,                  -- free-text confidence note from the source sheet
+  updated_at                  timestamptz not null default now(),
+  unique (product_type, length_in, texture)
+);
+
 -- ── Orders ───────────────────────────────────
 create table if not exists orders (
   id                       uuid        primary key default gen_random_uuid(),
@@ -225,6 +246,7 @@ alter table product_images     enable row level security;
 alter table product_variants   enable row level security;
 alter table categories         enable row level security;
 alter table product_categories enable row level security;
+alter table price_catalogue    enable row level security;
 alter table orders             enable row level security;
 alter table order_items        enable row level security;
 alter table profiles           enable row level security;
@@ -275,6 +297,10 @@ create policy "public_read_categories"
 create policy "public_read_product_categories"
   on product_categories for select
   using (true);
+
+-- price_catalogue holds factory cost — internal only, no public policy.
+-- service_role (the apply-price-catalogue.js script) bypasses RLS entirely;
+-- anon/authenticated clients get zero access by default.
 
 
 -- ── Orders ───────────────────────────────────
@@ -336,6 +362,11 @@ create index if not exists idx_pc_category          on product_categories(catego
 
 -- categories (subcategory lookups)
 create index if not exists idx_categories_parent    on categories(parent_id);
+
+-- price_catalogue (the unique constraint above already covers the full
+-- product_type/length_in/texture lookup; this just speeds up "all rows for
+-- a product_type" queries)
+create index if not exists idx_price_catalogue_type on price_catalogue(product_type);
 
 -- orders
 create index if not exists idx_orders_user_id       on orders(user_id);
@@ -436,7 +467,7 @@ create policy "public_read_product_images_storage"
 -- DONE
 -- =============================================
 -- Tables  : categories, products, product_images, product_variants,
---           product_categories, orders, order_items, profiles
+--           product_categories, price_catalogue, orders, order_items, profiles
 -- Security: RLS enabled on all tables, CHECK constraints on every
 --           user-submitted field, service_role-only writes for orders
 -- Triggers: auto updated_at, auto profile creation on signup,
@@ -447,3 +478,6 @@ create policy "public_read_product_images_storage"
 --           (categories.parent_id)
 -- Columns : products.color_group_id / color_name — links products that are
 --           color variants of the same style for the swatch-switcher UI
+-- Pricing : price_catalogue — editable factory-cost/retail reference (USD
+--           cents) used by scripts/apply-price-catalogue.js to seed and
+--           reprice real products; internal-only, no public RLS policy

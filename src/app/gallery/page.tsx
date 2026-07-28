@@ -236,7 +236,7 @@ function TutorialCard({
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <span className="absolute top-3 left-3 m-label bg-black/60 text-white px-2 py-1 rounded">
+          <span className="absolute top-3 left-3 m-label bg-black/70 text-white px-2 py-1 rounded">
             {item.category}
           </span>
         </div>
@@ -350,7 +350,7 @@ function Lightbox({
             rel="noopener noreferrer"
             className="mt-auto pt-4 flex items-center gap-2 text-white/90 hover:text-[var(--m-gold)] transition-colors"
           >
-            <span className="m-label">Tutorial by</span>
+            <span className="m-label text-white/70">Tutorial by</span>
             <span className="z-label-1">@{item.influencer.handle}</span>
           </a>
         </div>

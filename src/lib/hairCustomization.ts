@@ -18,6 +18,20 @@ export function colorNameToSwatchClassName(colorName: string): string | undefine
   )?.swatchClassName;
 }
 
+// ── Blend suggestions for "Shop by Your Hair Color" ──────────────────
+// Curated adjacency across the tonal spectrum (darkest to lightest): each
+// color maps to itself plus its immediate neighbor(s), used to suggest
+// shades that blend well with a shopper's own hair color.
+export const COLOR_BLEND_MATCHES: Record<string, string[]> = {
+  "Natural Black": ["Natural Black", "Dark Brown"],
+  "Dark Brown": ["Dark Brown", "Natural Black", "Chestnut Brown"],
+  "Chestnut Brown": ["Chestnut Brown", "Dark Brown", "Natural Brown"],
+  "Natural Brown": ["Natural Brown", "Chestnut Brown", "Caramel Brown"],
+  "Caramel Brown": ["Caramel Brown", "Natural Brown", "Blonde"],
+  "Blonde": ["Blonde", "Caramel Brown", "Platinum Blonde"],
+  "Platinum Blonde": ["Platinum Blonde", "Blonde"],
+};
+
 // ── Standard lengths (even inches 16–32, one row, matches DB's existing convention) ──
 export const STANDARD_LENGTHS_IN: number[] = Array.from({ length: 9 }, (_, i) => 16 + i * 2);
 

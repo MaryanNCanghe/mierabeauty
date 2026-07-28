@@ -3,7 +3,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import Pagination from './Pagination';
 import ProductCard, { type ProductCardData } from './ProductCard';
 
-const PRODUCT_PER_PAGE = 9; // 3-column grid fills evenly
+const PRODUCT_PER_PAGE = 12; // 3-column grid fills evenly
 
 export default async function ProductListSupabase({
   searchParams,
@@ -38,7 +38,7 @@ export default async function ProductListSupabase({
     .gte('price_cents', min * 100)
     .lte('price_cents', max * 100);
 
-  if (name) query = query.ilike('name', `${name}%`);
+  if (name) query = query.ilike('name', `%${name}%`);
 
   if (catSlug) {
     const { data: cat, error: catErr } = await supabase
