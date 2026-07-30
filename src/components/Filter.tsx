@@ -69,35 +69,44 @@ export default function Filter({ categories, isOpen, onClose }: Props) {
   const pathname     = usePathname();
   const searchParams = useSearchParams();
 
-  const [cat,  setCat]  = useState(searchParams.get("cat")  ?? "");
-  const [sort, setSort] = useState(searchParams.get("sort") ?? "");
-  const [min,  setMin]  = useState(searchParams.get("min")  ?? "");
-  const [max,  setMax]  = useState(searchParams.get("max")  ?? "");
+  const [cat,     setCat]     = useState(searchParams.get("cat")     ?? "");
+  const [texture, setTexture] = useState(searchParams.get("texture") ?? "");
+  const [sort,    setSort]    = useState(searchParams.get("sort")    ?? "");
+  const [min,     setMin]     = useState(searchParams.get("min")     ?? "");
+  const [max,     setMax]     = useState(searchParams.get("max")     ?? "");
 
   const categoryTree = buildCategoryTree(categories);
 
-  const activeCount = [cat, sort, min, max].filter(Boolean).length;
+  // Texture is its own filter facet (a real column on products), independent
+  // of category — sourced from the same categories prop already fetched,
+  // no extra query. These are exactly the 7 categories nested under "bundles".
+  const bundlesCategory = categories.find((c) => c.slug === "bundles");
+  const textureOptions = categories.filter((c) => c.parent_id === bundlesCategory?.id);
+
+  const activeCount = [cat, texture, sort, min, max].filter(Boolean).length;
 
   function push(overrides: Record<string, string>) {
-    const merged = { cat, sort, min, max, ...overrides };
+    const merged = { cat, texture, sort, min, max, ...overrides };
     const params = new URLSearchParams();
-    if (merged.cat)  params.set("cat",  merged.cat);
-    if (merged.sort) params.set("sort", merged.sort);
-    if (merged.min)  params.set("min",  merged.min);
-    if (merged.max)  params.set("max",  merged.max);
+    if (merged.cat)     params.set("cat",     merged.cat);
+    if (merged.texture) params.set("texture", merged.texture);
+    if (merged.sort)    params.set("sort",    merged.sort);
+    if (merged.min)     params.set("min",     merged.min);
+    if (merged.max)     params.set("max",     merged.max);
     router.push(`${pathname}?${params.toString()}`);
   }
 
   function clearAll() {
-    setCat(""); setSort(""); setMin(""); setMax("");
+    setCat(""); setTexture(""); setSort(""); setMin(""); setMax("");
     router.push(pathname);
   }
 
   useEffect(() => {
-    setCat(searchParams.get("cat")  ?? "");
-    setSort(searchParams.get("sort") ?? "");
-    setMin(searchParams.get("min")  ?? "");
-    setMax(searchParams.get("max")  ?? "");
+    setCat(searchParams.get("cat")     ?? "");
+    setTexture(searchParams.get("texture") ?? "");
+    setSort(searchParams.get("sort")   ?? "");
+    setMin(searchParams.get("min")     ?? "");
+    setMax(searchParams.get("max")     ?? "");
   }, [searchParams]);
 
   const panelContent = (
@@ -188,6 +197,39 @@ export default function Filter({ categories, isOpen, onClose }: Props) {
                   </div>
                 )}
               </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* Texture — independent of category */}
+      {textureOptions.length > 0 && (
+        <Section title="TEXTURE">
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => { setTexture(""); push({ texture: "" }); }}
+              className={`flex items-center text-left m-label transition-colors ${
+                !texture ? "text-[var(--m-black)] font-medium" : "text-[var(--m-muted)] hover:text-[var(--m-black)]"
+              }`}
+            >
+              <FilterDot active={!texture} />
+              All
+            </button>
+            {textureOptions.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => { setTexture(t.slug); push({ texture: t.slug }); }}
+                className={`flex items-center text-left m-label transition-colors ${
+                  texture === t.slug
+                    ? "text-[var(--m-black)] font-medium"
+                    : "text-[var(--m-muted)] hover:text-[var(--m-black)]"
+                }`}
+              >
+                <FilterDot active={texture === t.slug} />
+                {t.name ?? t.slug}
+              </button>
             ))}
           </div>
         </Section>

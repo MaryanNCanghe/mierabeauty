@@ -191,6 +191,7 @@ async function importColorProduct(cfg, entry, categoryId, bundlesId, colorGroupI
       is_active: true,
       color_group_id: colorGroupId,
       color_name: colorName,
+      texture: cfg.textureSlug,
     })
     .select("id")
     .single();
@@ -239,6 +240,11 @@ async function main() {
   }
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
   const { categorySlug, nameTemplate, slugPrefix, storagePrefix, colors } = manifest;
+  // texture defaults to the category itself (true for all 7 texture
+  // categories); manifests for non-texture categories (Clip-Ins, Tape-Ins,
+  // etc.) must set this explicitly since their hair texture isn't implied
+  // by their category slug.
+  const textureSlug = manifest.textureSlug ?? categorySlug;
 
   console.log(`── Importing '${categorySlug}' from ${path.basename(manifestPath)} ──`);
   const categoryId = await getCategoryId(categorySlug);
@@ -250,7 +256,14 @@ async function main() {
   const colorGroupId = crypto.randomUUID();
 
   for (const entry of colors) {
-    await importColorProduct({ nameTemplate, slugPrefix, storagePrefix }, entry, categoryId, bundlesId, colorGroupId, chartUrl);
+    await importColorProduct(
+      { nameTemplate, slugPrefix, storagePrefix, textureSlug },
+      entry,
+      categoryId,
+      bundlesId,
+      colorGroupId,
+      chartUrl
+    );
   }
 
   console.log("Done.");

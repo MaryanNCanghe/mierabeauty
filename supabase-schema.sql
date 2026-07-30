@@ -48,6 +48,14 @@ create table if not exists products (
 alter table products add column if not exists color_group_id uuid;
 alter table products add column if not exists color_name text;
 
+-- Idempotent: real, filterable texture attribute (e.g. 'straight',
+-- 'body-wave') independent of category — a Clip-In or Lace Front Wig can
+-- carry a texture too, not just Bundles. Matches the slugs of the 7 texture
+-- categories under "bundles". Set by scripts/import-color-products.js on
+-- every new import; scripts/backfill-texture.js filled it in for products
+-- created before this column existed.
+alter table products add column if not exists texture text;
+
 -- ── Product Images ───────────────────────────
 create table if not exists product_images (
   id          uuid    primary key default gen_random_uuid(),
@@ -351,6 +359,7 @@ create index if not exists idx_products_created_at  on products(created_at desc)
 create index if not exists idx_products_price       on products(price_cents);
 create index if not exists idx_products_name_trgm   on products using gin(name gin_trgm_ops);
 create index if not exists idx_products_color_group on products(color_group_id);
+create index if not exists idx_products_texture     on products(texture);
 
 -- product_images / variants
 create index if not exists idx_product_images_pid   on product_images(product_id);

@@ -23,11 +23,12 @@ export default async function ProductListSupabase({
   const rangeFrom = page * PRODUCT_PER_PAGE;
   const rangeTo   = rangeFrom + PRODUCT_PER_PAGE - 1;
 
-  const name    = (searchParams?.name ?? '').trim();
-  const min     = Number(searchParams?.min ?? 0);
-  const max     = Number(searchParams?.max ?? 9_999_999);
-  const sort    = (searchParams?.sort ?? '') as string;
-  const catSlug = (searchParams?.cat ?? '').trim();
+  const name        = (searchParams?.name ?? '').trim();
+  const min         = Number(searchParams?.min ?? 0);
+  const max         = Number(searchParams?.max ?? 9_999_999);
+  const sort        = (searchParams?.sort ?? '') as string;
+  const catSlug     = (searchParams?.cat ?? '').trim();
+  const textureSlug = (searchParams?.texture ?? '').trim();
 
   let query = supabase
     .from('products')
@@ -39,6 +40,10 @@ export default async function ProductListSupabase({
     .lte('price_cents', max * 100);
 
   if (name) query = query.ilike('name', `%${name}%`);
+
+  // Texture is a plain column on products, independent of category — a
+  // separate, combinable filter (e.g. Clip-Ins + Straight together).
+  if (textureSlug) query = query.eq('texture', textureSlug);
 
   if (catSlug) {
     const { data: cat, error: catErr } = await supabase

@@ -85,6 +85,11 @@ const Menu = ({ categories = [], light = false }: { categories?: Category[]; lig
               Factory
             </Link>
           </li>
+          <li>
+            <Link href="/maintenance" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
+              Maintenance
+            </Link>
+          </li>
         </ul>
 
         {shopCategories.length > 0 && (

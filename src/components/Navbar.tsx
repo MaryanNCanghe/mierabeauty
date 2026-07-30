@@ -90,6 +90,9 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
               <Link href="/factory" className="hover:text-[var(--m-gold)] transition-colors duration-200">
                 Factory
               </Link>
+              <Link href="/maintenance" className="hover:text-[var(--m-gold)] transition-colors duration-200">
+                Maintenance
+              </Link>
             </div>
           </div>
 

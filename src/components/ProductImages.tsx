@@ -161,7 +161,7 @@ export default function ProductImages({ items }: { items: ProductImageItem[] | u
               type="button"
               onClick={() => setLightboxOpen(false)}
               aria-label="Close"
-              className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors p-2"
+              className="absolute top-6 right-6 z-10 text-white/80 hover:text-white transition-colors p-2"
             >
               <CloseIcon />
             </button>
@@ -175,7 +175,7 @@ export default function ProductImages({ items }: { items: ProductImageItem[] | u
                     goPrev();
                   }}
                   aria-label="Previous image"
-                  className="absolute left-2 md:left-8 text-white/70 hover:text-white transition-colors p-2"
+                  className="absolute left-2 md:left-8 z-10 text-white/70 hover:text-white transition-colors p-2"
                 >
                   <ChevronIcon direction="left" />
                 </button>
@@ -186,17 +186,16 @@ export default function ProductImages({ items }: { items: ProductImageItem[] | u
                     goNext();
                   }}
                   aria-label="Next image"
-                  className="absolute right-2 md:right-8 text-white/70 hover:text-white transition-colors p-2"
+                  className="absolute right-2 md:right-8 z-10 text-white/70 hover:text-white transition-colors p-2"
                 >
                   <ChevronIcon direction="right" />
                 </button>
               </>
             )}
 
-            <div
-              className="relative w-full h-full max-w-5xl max-h-[85vh] mx-6"
-              onClick={(e) => e.stopPropagation()}
-            >
+            {/* No stopPropagation here on purpose — tapping the photo
+                itself should also close the lightbox, same as the backdrop. */}
+            <div className="relative w-full h-full max-w-5xl max-h-[85vh] mx-6">
               <Image
                 src={current.url}
                 alt={current.alt ?? 'Product image'}
