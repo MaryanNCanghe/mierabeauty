@@ -84,11 +84,11 @@ const Navbar = ({ categories = [] }: { categories?: Category[] }) => {
               <Link href="/about" className="hover:text-[var(--m-gold)] transition-colors duration-200">
                 About
               </Link>
-              <Link href="/gallery" className="hover:text-[var(--m-gold)] transition-colors duration-200">
+              <Link href="/tutorials" className="hover:text-[var(--m-gold)] transition-colors duration-200">
                 Tutorials
               </Link>
-              <Link href="/factory" className="hover:text-[var(--m-gold)] transition-colors duration-200">
-                Factory
+              <Link href="/gallery" className="hover:text-[var(--m-gold)] transition-colors duration-200">
+                Gallery
               </Link>
               <Link href="/maintenance" className="hover:text-[var(--m-gold)] transition-colors duration-200">
                 Maintenance

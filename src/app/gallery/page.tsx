@@ -1,191 +1,96 @@
-
 "use client";
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * Tutorials page:
- * - Category filter (Hair, Wig Installation, Makeup, Skincare)
- * - Masonry layout via CSS columns
- * - Tip preview overlay on hover
- * - Click/tap opens lightbox with full description + influencer credit
+ * Gallery page (formerly "Factory") — behind-the-scenes sourcing photos/
+ * videos, straight from public/factory images./. No categories or per-item
+ * metadata, just a grid that opens a lightbox on click (video items play
+ * inline).
  */
 
-type Category = "Hair" | "Wig Installation" | "Makeup" | "Skincare";
-
-const CATEGORIES: Category[] = ["Hair", "Wig Installation", "Makeup", "Skincare"];
-
-type Influencer = {
-  name: string;
-  handle: string; // without @
-  url: string;
-};
-
-type TutorialItem = {
-  id: string | number;
-  category: Category;
-  title: string;
-  tip: string; // short teaser, shown on hover
-  description: string; // fuller tutorial text, shown in lightbox
+type GalleryItem = {
+  id: string;
+  type: "image" | "video";
   src: string;
-  width: number; // intrinsic width (for aspect ratio)
-  height: number; // intrinsic height
-  influencer: Influencer;
 };
 
-// Inline data — replace images, copy, and @handles with your own content
-const tutorialItems: TutorialItem[] = [
-  {
-    id: 1,
-    category: "Hair",
-    title: "Silk Press for Beginners",
-    tip: "Section in four, blow-dry on cool, and never press over dirty hair.",
-    description:
-      "Wash and deep-condition first — a silk press only lasts on clean, moisturized hair. Blow-dry each section on a cool setting to cut frizz, then flat-iron in small passes with a heat protectant. Finish with a lightweight oil for shine, not weight.",
-    src: "https://images.pexels.com/photos/3065171/pexels-photo-3065171.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1600,
-    height: 2133,
-    influencer: { name: "Ama Boateng", handle: "styledby.ama", url: "https://instagram.com/styledby.ama" },
-  },
-  {
-    id: 2,
-    category: "Hair",
-    title: "Protective Twist-Out Routine",
-    tip: "Twist on damp hair with a leave-in + gel combo for definition that lasts all week.",
-    description:
-      "Apply leave-in conditioner followed by a curl-defining gel on damp hair, then twist in even sections from root to tip. Let air-dry or sit under a hooded dryer, and unravel gently once fully dry — never wet — to avoid frizz.",
-    src: "https://images.pexels.com/photos/3065209/pexels-photo-3065209.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1600,
-    height: 1067,
-    influencer: { name: "Naima Cisse", handle: "naima.curls", url: "https://instagram.com/naima.curls" },
-  },
-  {
-    id: 3,
-    category: "Wig Installation",
-    title: "Melted Lace Install, No Glue Bumps",
-    tip: "Bleach the knots, tint the lace to your scalp, and lay edges with a soft brush — not gel alone.",
-    description:
-      "Pluck and bleach the knots for a natural hairline, then tint the lace with foundation matched to your scalp tone. Lay the lace with a thin layer of adhesive, press with a cool rag, then blend edges using an edge brush and light gel — heavy product is what causes bumps.",
-    src: "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1067,
-    height: 1600,
-    influencer: { name: "Tola Adeyemi", handle: "wigsbytola", url: "https://instagram.com/wigsbytola" },
-  },
-  {
-    id: 4,
-    category: "Wig Installation",
-    title: "Glueless Install for Everyday Wear",
-    tip: "Braid down flat, use a wig grip band, and adjust the elastic combs for a secure, damage-free fit.",
-    description:
-      "Braid your natural hair flat to the scalp and cover with a thin wig cap. Fit an adjustable wig grip band underneath for grip without tension, then snap the wig's elastic combs into your braids. No heat, no glue — fully reusable and easy to take down at night.",
-    src: "https://images.pexels.com/photos/3065179/pexels-photo-3065179.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1600,
-    height: 1067,
-    influencer: { name: "Rosa Mbeki", handle: "gluelessqueen", url: "https://instagram.com/gluelessqueen" },
-  },
-  {
-    id: 5,
-    category: "Makeup",
-    title: "Everyday Soft-Glam Base",
-    tip: "Prime, then build coverage in thin layers — heavy first coats crease by noon.",
-    description:
-      "Start with a hydrating primer suited to your skin type. Apply foundation in thin layers with a damp sponge, building only where needed. Set with a light dusting of powder just on the T-zone, and finish with cream blush for a natural flush that photographs well.",
-    src: "https://images.pexels.com/photos/2691959/pexels-photo-2691959.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1600,
-    height: 2400,
-    influencer: { name: "Fatima Njie", handle: "fatima.glam", url: "https://instagram.com/fatima.glam" },
-  },
-  {
-    id: 6,
-    category: "Makeup",
-    title: "Bold Lip That Actually Stays",
-    tip: "Line, blot, reapply, blot again — that's the secret to a lip that survives dinner.",
-    description:
-      "Line the lips first to create a base the color can grip. Apply lipstick, blot with tissue, then apply a second coat and blot again. This double-layer method is what makes bold color last through eating and drinking without a full touch-up.",
-    src: "https://images.pexels.com/photos/2113855/pexels-photo-2113855.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1600,
-    height: 1067,
-    influencer: { name: "Keisha Odom", handle: "keishabeat", url: "https://instagram.com/keishabeat" },
-  },
-  {
-    id: 7,
-    category: "Skincare",
-    title: "Layering Actives Without Irritation",
-    tip: "Never stack retinol and exfoliating acids on the same night — alternate instead.",
-    description:
-      "Cleanse, then apply water-based actives (like niacinamide or vitamin C) in the morning, saving retinol for night use only. Alternate retinol and exfoliating acid nights rather than layering both, and always follow with a fragrance-free moisturizer and SPF the next morning.",
-    src: "https://images.pexels.com/photos/3785147/pexels-photo-3785147.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1600,
-    height: 2133,
-    influencer: { name: "Zainab Toure", handle: "skinbyzainab", url: "https://instagram.com/skinbyzainab" },
-  },
-  {
-    id: 8,
-    category: "Skincare",
-    title: "Shea + Marula Night Ritual",
-    tip: "Warm the balm between your palms first — it absorbs faster and won't feel greasy.",
-    description:
-      "After cleansing, warm a small amount of shea and marula balm between your palms until it turns to oil, then press (don't rub) into damp skin. The warmth helps it absorb rather than sit on top, locking in moisture overnight without clogging pores.",
-    src: "https://images.pexels.com/photos/3762879/pexels-photo-3762879.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    width: 1600,
-    height: 1067,
-    influencer: { name: "Miera Sow", handle: "mieraskin", url: "https://instagram.com/mieraskin" },
-  },
+const FACTORY_IMAGES = [
+  "WhatsApp Image 2026-07-10 at 16.14.33.jpeg",
+  "WhatsApp Image 2026-07-14 at 15.32.20.jpeg",
+  "WhatsApp Image 2026-07-20 at 08.47.19 (2).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.47.19.jpeg",
+  "WhatsApp Image 2026-07-20 at 08.47.20 (2).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.47.20 (3).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.47.22 (1).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.47.22.jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.25 (1).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.25.jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.26 (1).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.26 (2).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.26 (3).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.26.jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.27 (2).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.28 (1).jpeg",
+  "WhatsApp Image 2026-07-20 at 08.54.28.jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.20 (1).jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.20.jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.23 (1).jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.23 (2).jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.23 (3).jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.23.jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.24 (1).jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.24.jpeg",
+  "Lace fronts/WhatsApp Image 2026-07-20 at 08.47.25.jpeg",
+];
+
+const FACTORY_VIDEOS = [
+  "WhatsApp Video 2026-07-10 at 16.13.57.mp4",
+  "WhatsApp Video 2026-07-12 at 15.51.50.mp4",
+  "WhatsApp Video 2026-07-13 at 18.14.45.mp4",
+  "WhatsApp Video 2026-07-14 at 15.54.01.mp4",
+  "Lace fronts/WhatsApp Video 2026-07-10 at 16.14.28.mp4",
+];
+
+function encodePath(relPath: string): string {
+  return relPath
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/");
+}
+
+const BASE = "/factory images.";
+
+const items: GalleryItem[] = [
+  ...FACTORY_IMAGES.map((f) => ({ id: f, type: "image" as const, src: `${BASE}/${encodePath(f)}` })),
+  ...FACTORY_VIDEOS.map((f) => ({ id: f, type: "video" as const, src: `${BASE}/${encodePath(f)}` })),
 ];
 
 export default function GalleryPage() {
-  const [activeCategory, setActiveCategory] = useState<Category | "All">("All");
   const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-
-  const filteredItems = useMemo(
-    () =>
-      activeCategory === "All"
-        ? tutorialItems
-        : tutorialItems.filter((item) => item.category === activeCategory),
-    [activeCategory]
-  );
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const openLightbox = (index: number) => {
     setActiveIndex(index);
     setIsOpen(true);
   };
-
   const closeLightbox = () => setIsOpen(false);
-  const next = () => setActiveIndex((i) => (i === filteredItems.length - 1 ? 0 : i + 1));
-  const prev = () => setActiveIndex((i) => (i === 0 ? filteredItems.length - 1 : i - 1));
+  const next = () => setActiveIndex((i) => (i === items.length - 1 ? 0 : i + 1));
+  const prev = () => setActiveIndex((i) => (i === 0 ? items.length - 1 : i - 1));
 
   return (
     <main className="min-h-screen bg-[var(--m-white)] mt-20">
-      {/* Header */}
       <header className="w-full px-4 sm:px-6 lg:px-16 pt-10 pb-6">
-        <span className="m-label text-[var(--m-gold)]">Learn With Us</span>
-        <h1 className="font-display text-3xl md:text-4xl font-light mt-2 text-[var(--m-black)]">
-          Tutorials
+        <span className="m-label text-[var(--m-gold)]">Behind the Scenes</span>
+        <h1 className="font-display text-2xl md:text-3xl font-light mt-2 text-[var(--m-black)]">
+          Gallery
         </h1>
         <p className="z-label-1 mt-3 max-w-xl text-[var(--m-muted)]">
-          Hair, wig installs, makeup, and skincare — tips from the creators who inspire us.
+          A look at where your hair comes from — straight from the source.
         </p>
       </header>
 
-      {/* Category filter */}
-      <div className="w-full px-4 sm:px-6 lg:px-16 pb-8 flex flex-wrap gap-3">
-        {(["All", ...CATEGORIES] as const).map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => setActiveCategory(cat)}
-            className={`m-btn m-btn--sm ${
-              activeCategory === cat ? "m-btn--primary" : "m-btn--secondary"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Uniform grid — equal-size cards, like a YouTube video grid */}
       <section
         className="
           w-full
@@ -195,74 +100,58 @@ export default function GalleryPage() {
           gap-4 sm:gap-6
         "
       >
-        {filteredItems.map((item, index) => (
-          <TutorialCard key={item.id} item={item} onOpen={() => openLightbox(index)} />
+        {items.map((item, index) => (
+          <GalleryCard key={item.id} item={item} onOpen={() => openLightbox(index)} />
         ))}
       </section>
 
-      {/* Lightbox */}
-      {isOpen && filteredItems.length > 0 && (
-        <Lightbox
-          item={filteredItems[activeIndex]}
-          onClose={closeLightbox}
-          onPrev={prev}
-          onNext={next}
-        />
+      {isOpen && items.length > 0 && (
+        <GalleryLightbox item={items[activeIndex]} onClose={closeLightbox} onPrev={prev} onNext={next} />
       )}
     </main>
   );
 }
 
-function TutorialCard({
-  item,
-  onOpen,
-}: {
-  item: TutorialItem;
-  onOpen: () => void;
-}) {
+function GalleryCard({ item, onOpen }: { item: GalleryItem; onOpen: () => void }) {
   return (
-    <figure className="group" aria-label={item.title}>
-      <button
-        type="button"
-        onClick={onOpen}
-        className="block w-full text-left rounded-2xl overflow-hidden bg-white shadow-sm group-hover:shadow-lg transition-shadow duration-500"
-      >
-        {/* Thumbnail — fixed 16:9 aspect for every card, like a video grid */}
-        <div className="relative w-full aspect-video bg-[var(--m-blush)] overflow-hidden">
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group block w-full text-left rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg transition-shadow duration-500"
+    >
+      <div className="relative w-full aspect-video bg-[var(--m-blush)] overflow-hidden">
+        {item.type === "video" ? (
+          <video src={item.src} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+        ) : (
           <Image
             src={item.src}
-            alt={item.title}
+            alt=""
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <span className="absolute top-3 left-3 m-label bg-black/70 text-white px-2 py-1 rounded">
-            {item.category}
+        )}
+        {item.type === "video" && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
+                <path d="M2 1l11 6-11 6V1z" />
+              </svg>
+            </span>
           </span>
-        </div>
-
-        {/* Info — always visible, same size for every card */}
-        <figcaption className="px-3 py-3 sm:px-4 sm:py-4 bg-white">
-          <p className="font-display text-base sm:text-lg font-light leading-snug text-[var(--m-black)] line-clamp-1">
-            {item.title}
-          </p>
-          <p className="mt-1 text-[var(--m-muted)] text-xs font-light leading-relaxed line-clamp-2">
-            {item.tip}
-          </p>
-          <p className="m-label mt-2 text-[var(--m-gold)]">@{item.influencer.handle}</p>
-        </figcaption>
-      </button>
-    </figure>
+        )}
+      </div>
+    </button>
   );
 }
 
-function Lightbox({
+function GalleryLightbox({
   item,
   onClose,
   onPrev,
   onNext,
 }: {
-  item: TutorialItem;
+  item: GalleryItem;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
@@ -285,75 +174,52 @@ function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label={`Viewing tutorial: ${item.title}`}
       onClick={onClose}
     >
-      <div
-        className="relative max-w-6xl w-full h-full md:h-[90vh] flex flex-col md:flex-row items-stretch bg-[var(--m-black)]"
-        onClick={(e) => e.stopPropagation()}
+      <button
+        ref={closeBtnRef}
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors p-2"
       >
-        {/* Image */}
-        <div className="relative w-full md:w-3/5 h-[45vh] md:h-full">
-          <Image
-            src={item.src}
-            alt={item.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 60vw"
-            className="object-cover"
-            priority
-          />
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M2 2L16 16M16 2L2 16" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        </svg>
+      </button>
 
-          {/* Controls */}
-          <div className="absolute inset-0 flex items-center justify-between px-2">
-            <button
-              type="button"
-              onClick={onPrev}
-              aria-label="Previous"
-              className="rounded-full bg-white/70 hover:bg-white text-gray-900 w-10 h-10 flex items-center justify-center shadow"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={onNext}
-              aria-label="Next"
-              className="rounded-full bg-white/70 hover:bg-white text-gray-900 w-10 h-10 flex items-center justify-center shadow"
-            >
-              ›
-            </button>
-          </div>
-        </div>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onPrev();
+        }}
+        aria-label="Previous"
+        className="absolute left-2 md:left-8 text-white/70 hover:text-white p-2"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onNext();
+        }}
+        aria-label="Next"
+        className="absolute right-2 md:right-8 text-white/70 hover:text-white p-2"
+      >
+        ›
+      </button>
 
-        {/* Details panel */}
-        <div className="relative w-full md:w-2/5 h-full overflow-y-auto p-6 md:p-8 flex flex-col gap-4">
-          <button
-            ref={closeBtnRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="absolute top-4 right-4 rounded-md bg-white/10 hover:bg-white/20 text-white px-3 py-1 text-sm"
-          >
-            Close
-          </button>
-
-          <span className="m-label text-[var(--m-gold)]">{item.category}</span>
-          <h2 className="font-display text-xl md:text-2xl font-light text-white">{item.title}</h2>
-          <hr className="m-divider" />
-          <p className="text-white/80 text-sm leading-relaxed">{item.description}</p>
-
-          <a
-            href={item.influencer.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-auto pt-4 flex items-center gap-2 text-white/90 hover:text-[var(--m-gold)] transition-colors"
-          >
-            <span className="m-label text-white/70">Tutorial by</span>
-            <span className="z-label-1">@{item.influencer.handle}</span>
-          </a>
-        </div>
+      <div className="relative w-full h-full max-w-5xl max-h-[85vh] mx-6" onClick={(e) => e.stopPropagation()}>
+        {item.type === "video" ? (
+          <video src={item.src} className="w-full h-full object-contain" controls autoPlay playsInline />
+        ) : (
+          <Image src={item.src} alt="" fill sizes="100vw" className="object-contain" />
+        )}
       </div>
     </div>
   );

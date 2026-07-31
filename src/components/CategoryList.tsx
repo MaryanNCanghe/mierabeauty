@@ -70,7 +70,8 @@ const CategoryList = async () => {
     parent_id: hair?.id ?? null,
     image_url: null,
     displayName: "Build Your Own",
-    displayImage: null,
+    displayImage:
+      "https://epptibwjvogadqehnyua.supabase.co/storage/v1/object/public/product-images/decorative/natural-black-kinky-curly-ponytail.png",
     isCustomTile: true,
   };
 
@@ -100,24 +101,23 @@ const CategoryList = async () => {
               key={item.id}
             >
               <div className="relative bg-[var(--m-blush)] w-full h-56 sm:h-64 md:h-72 overflow-hidden rounded-lg">
-                {item.isCustomTile ? (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--m-blush)] to-[var(--m-gold)]/40 flex flex-col items-center justify-center gap-3">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                      <path d="M6 6L26 26M26 6L6 26" stroke="var(--m-earth)" strokeWidth="1.5" strokeLinecap="round" />
-                      <circle cx="8" cy="24" r="3" stroke="var(--m-earth)" strokeWidth="1.5" />
-                      <circle cx="24" cy="24" r="3" stroke="var(--m-earth)" strokeWidth="1.5" />
+                {item.displayImage && (
+                  <Image
+                    src={item.displayImage}
+                    alt={item.displayName ?? ""}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover"
+                  />
+                )}
+                {item.isCustomTile && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent flex flex-col items-center justify-end pb-6 gap-3">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                      <path d="M6 6L26 26M26 6L6 26" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                      <circle cx="8" cy="24" r="3" stroke="white" strokeWidth="1.5" />
+                      <circle cx="24" cy="24" r="3" stroke="white" strokeWidth="1.5" />
                     </svg>
                   </div>
-                ) : (
-                  item.displayImage && (
-                    <Image
-                      src={item.displayImage}
-                      alt={item.displayName ?? ""}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover"
-                    />
-                  )
                 )}
               </div>
               <h1 className="mt-4 z-label-1 tracking-wide border-b border-[var(--m-black)] pb-2 block w-full">

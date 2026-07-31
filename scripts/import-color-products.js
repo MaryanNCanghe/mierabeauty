@@ -184,7 +184,7 @@ async function importColorProduct(cfg, entry, categoryId, bundlesId, colorGroupI
     .from("products")
     .insert({
       slug: productSlug,
-      name: `${cfg.nameTemplate} in ${colorName}`,
+      name: `${cfg.nameTemplate} - ${colorName}`,
       description: `${cfg.nameTemplate} in ${colorName}, crafted from real, ethically-sourced human hair with a naturally glossy finish.`,
       price_cents: priceCents ?? DEFAULT_PRICE_CENTS,
       main_image_url: bundleUrls[0],

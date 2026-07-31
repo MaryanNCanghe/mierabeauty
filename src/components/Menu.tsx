@@ -76,13 +76,13 @@ const Menu = ({ categories = [], light = false }: { categories?: Category[]; lig
             </Link>
           </li>
           <li>
-            <Link href="/gallery" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
+            <Link href="/tutorials" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
               Tutorials
             </Link>
           </li>
           <li>
-            <Link href="/factory" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
-              Factory
+            <Link href="/gallery" onClick={() => setOpen(false)} className="border-b border-transparent hover:border-[var(--m-gold)] hover:text-[var(--m-gold)] transition-colors duration-300 pb-1">
+              Gallery
             </Link>
           </li>
           <li>
