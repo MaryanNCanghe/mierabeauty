@@ -25,6 +25,7 @@ const HomePage = async () => {
             limit={8}
             showPagination={false}
             gridCols={4}
+            oneProductPerStyle
           />
         </Suspense>
       </div>

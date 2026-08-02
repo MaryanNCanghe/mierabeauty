@@ -10,12 +10,18 @@ export default async function ProductListSupabase({
   showPagination = true,
   limit,
   gridCols = 3,
+  oneProductPerStyle = false,
 }: {
   searchParams?: any;
   showPagination?: boolean;
   limit?: number;
   /** Number of columns on desktop — drives Tailwind grid class */
   gridCols?: 2 | 3 | 4;
+  /** When true, shows at most one color per style (color_group_id) instead
+   * of e.g. every color of the same Straight Bundle — for sections like New
+   * Arrivals where variety matters more than showing every color. Products
+   * without a color_group_id are always unique on their own. */
+  oneProductPerStyle?: boolean;
 }) {
   const supabase = supabaseServer();
 
@@ -33,7 +39,7 @@ export default async function ProductListSupabase({
   let query = supabase
     .from('products')
     .select(
-      'id, slug, name, description, price_cents, main_image_url',
+      'id, slug, name, description, price_cents, main_image_url, color_group_id, created_at',
       { count: showPagination ? 'exact' : undefined }
     )
     .gte('price_cents', min * 100)
@@ -75,13 +81,35 @@ export default async function ProductListSupabase({
       col === 'created_at' || col === 'lastUpdated' ? 'created_at' :
       'name';
     query = query.order(mappedCol, { ascending });
+  } else if (oneProductPerStyle) {
+    // "New Arrivals" should actually mean newest first, and picking the
+    // newest per style keeps whichever color was added most recently.
+    query = query.order('created_at', { ascending: false });
   }
 
   let items: any[] | null = null;
   let error: any = null;
   let count: number | null = null;
 
-  if (typeof limit === 'number' && limit > 0) {
+  if (oneProductPerStyle && typeof limit === 'number' && limit > 0) {
+    // Fetch a larger candidate pool, then keep only the first (newest)
+    // product per color_group_id so the same style doesn't show up in
+    // several colors — ungrouped products are always their own group.
+    const { data: candidates, error: candErr } = await query.range(0, Math.max(0, limit * 10 - 1));
+    error = candErr;
+    if (candidates) {
+      const seenGroups = new Set<string>();
+      const deduped: any[] = [];
+      for (const p of candidates) {
+        const key = p.color_group_id ?? `product-${p.id}`;
+        if (seenGroups.has(key)) continue;
+        seenGroups.add(key);
+        deduped.push(p);
+        if (deduped.length >= limit) break;
+      }
+      items = deduped;
+    }
+  } else if (typeof limit === 'number' && limit > 0) {
     ({ data: items, error } = await query.range(0, Math.max(0, limit - 1)));
   } else {
     ({ data: items, error, count } = await query.range(rangeFrom, rangeTo));
