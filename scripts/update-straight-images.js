@@ -84,7 +84,10 @@ const COLORS = [
   {
     productSlug: "straight-bundle-platinum-blonde",
     colorSlug: "platinum-blonde",
-    hero: path.join(DEMO_ROOT, "Platinum blonde.png"),
+    // No model/girl hero for this color — the bundle folder's own
+    // "-bundle-hero.png" shot (real bundle photography) serves as the
+    // final gallery image instead.
+    hero: null,
     bundleDir: path.join(SRC_ROOT, "platinum-blonde"),
   },
 ];
@@ -120,7 +123,9 @@ async function updateColor(entry) {
 
   console.log(`⬆️  Uploading ${bundleFiles.length} new bundle photo(s) + hero for ${entry.colorSlug}...`);
 
-  const heroUrl = await uploadFile(`straight/${entry.colorSlug}/hero${path.extname(entry.hero)}`, entry.hero);
+  const heroUrl = entry.hero
+    ? await uploadFile(`straight/${entry.colorSlug}/hero${path.extname(entry.hero)}`, entry.hero)
+    : null;
   const bundleUrls = [];
   for (let i = 0; i < bundleFiles.length; i++) {
     const localPath = path.join(entry.bundleDir, bundleFiles[i]);
@@ -128,7 +133,7 @@ async function updateColor(entry) {
     bundleUrls.push(await uploadFile(`straight/${entry.colorSlug}/bundle-${String(i + 1).padStart(2, "0")}${ext}`, localPath));
   }
 
-  const orderedImages = [...bundleUrls, heroUrl, CHART_URL];
+  const orderedImages = heroUrl ? [...bundleUrls, heroUrl, CHART_URL] : [...bundleUrls, CHART_URL];
 
   const { error: delErr } = await supabase.from("product_images").delete().eq("product_id", product.id);
   if (delErr) throw new Error(`Delete images failed for ${entry.productSlug}: ${delErr.message}`);
