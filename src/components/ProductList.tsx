@@ -92,19 +92,30 @@ export default async function ProductListSupabase({
   let count: number | null = null;
 
   if (oneProductPerStyle && typeof limit === 'number' && limit > 0) {
-    // Fetch a larger candidate pool, then keep only the first (newest)
-    // product per color_group_id so the same style doesn't show up in
-    // several colors — ungrouped products are always their own group.
+    // Fetch a larger candidate pool, then keep one product per
+    // color_group_id so the same style doesn't show up in several colors —
+    // ungrouped products are always their own group. Styles are ordered by
+    // their newest color (import batches insert colors in a fixed order,
+    // so always taking the newest would show the same color, e.g. platinum
+    // blonde, for every style) — the displayed color is picked at random
+    // from that style's available colors for real variety.
     const { data: candidates, error: candErr } = await query.range(0, Math.max(0, limit * 10 - 1));
     error = candErr;
     if (candidates) {
-      const seenGroups = new Set<string>();
-      const deduped: any[] = [];
+      const groupOrder: string[] = [];
+      const groups = new Map<string, any[]>();
       for (const p of candidates) {
         const key = p.color_group_id ?? `product-${p.id}`;
-        if (seenGroups.has(key)) continue;
-        seenGroups.add(key);
-        deduped.push(p);
+        if (!groups.has(key)) {
+          groups.set(key, []);
+          groupOrder.push(key);
+        }
+        groups.get(key)!.push(p);
+      }
+      const deduped: any[] = [];
+      for (const key of groupOrder) {
+        const members = groups.get(key)!;
+        deduped.push(members[Math.floor(Math.random() * members.length)]);
         if (deduped.length >= limit) break;
       }
       items = deduped;

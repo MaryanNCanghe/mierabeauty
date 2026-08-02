@@ -22,7 +22,7 @@ const HomePage = async () => {
         <h2 className="m-section-title m-section-title--underline mb-8">New Arrivals</h2>
         <Suspense fallback={<Skeleton />}>
           <ProductList
-            limit={8}
+            limit={10}
             showPagination={false}
             gridCols={4}
             oneProductPerStyle
