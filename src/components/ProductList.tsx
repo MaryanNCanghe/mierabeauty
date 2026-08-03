@@ -92,13 +92,16 @@ export default async function ProductListSupabase({
   let count: number | null = null;
 
   if (oneProductPerStyle && typeof limit === 'number' && limit > 0) {
-    // Fetch a larger candidate pool, then keep one product per
-    // color_group_id so the same style doesn't show up in several colors —
-    // ungrouped products are always their own group. Styles are ordered by
-    // their newest color (import batches insert colors in a fixed order,
-    // so always taking the newest would show the same color, e.g. platinum
-    // blonde, for every style) — the displayed color is picked at random
-    // from that style's available colors for real variety.
+    // Fetch a larger candidate pool, then fill the list by round-robining
+    // across style (color_group_id) groups — ungrouped products are always
+    // their own group. The catalogue currently has far fewer distinct
+    // styles than `limit`, so a strict one-card-per-style dedup would cap
+    // out well short of it. Instead: round 1 picks one random color per
+    // style (so every style is represented before any repeats); once every
+    // style has shown once, later rounds pick another random *not yet
+    // shown* color for a style, so a style can reappear but never with a
+    // color already used — never repeats the same color back to back, e.g.
+    // platinum blonde every time.
     const { data: candidates, error: candErr } = await query.range(0, Math.max(0, limit * 10 - 1));
     error = candErr;
     if (candidates) {
@@ -112,11 +115,19 @@ export default async function ProductListSupabase({
         }
         groups.get(key)!.push(p);
       }
+      const remaining = new Map(groupOrder.map((key) => [key, [...groups.get(key)!]]));
       const deduped: any[] = [];
-      for (const key of groupOrder) {
-        const members = groups.get(key)!;
-        deduped.push(members[Math.floor(Math.random() * members.length)]);
-        if (deduped.length >= limit) break;
+      while (deduped.length < limit) {
+        let pickedAny = false;
+        for (const key of groupOrder) {
+          const pool = remaining.get(key)!;
+          if (!pool.length) continue;
+          const idx = Math.floor(Math.random() * pool.length);
+          deduped.push(pool.splice(idx, 1)[0]);
+          pickedAny = true;
+          if (deduped.length >= limit) break;
+        }
+        if (!pickedAny) break; // every group exhausted — fewer than `limit` products exist
       }
       items = deduped;
     }
